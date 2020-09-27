@@ -16,10 +16,6 @@ class WuPhysarum(Model):
     """
     def __init__(
         self,
-        width=MODEL_PARAM["width"],
-        height=MODEL_PARAM["height"],
-        density=MODEL_PARAM["density"],
-        filename=MODEL_PARAM["filename"],
         seed=MODEL_PARAM["seed"],
     ):
         """
@@ -32,31 +28,38 @@ class WuPhysarum(Model):
             seed: 乱数のシード値
         """
         # create stage
-        datapoint = jsonreader(filename)
+        datapoint = jsonreader(MODEL_PARAM["filename"])
         stage_region = convex_hull_inner(datapoint)
 
         # create physarum agents
-        self.phy_grid = SingleGrid(width, height, torus=False)
+        self.phy_grid = SingleGrid(
+            width=MODEL_PARAM["width"],
+            height=MODEL_PARAM["height"],
+            torus=False)
         self.phy_schedule = RandomActivation(self)
         for (_x, _y) in stage_region:
-            if self.random.random() < density:
+            if self.random.random() < MODEL_PARAM["density"]:
                 phy = Physarum(
                     pos=(_x, _y),
-                    model=self
-                )
+                    model=self,)
                 self.phy_grid.place_agent(phy, (_x, _y))
                 self.phy_schedule.add(phy)
 
         # create lattice cell agents
-        self.ltc_grid = SingleGrid(width, height, torus=False)
+        self.ltc_grid = SingleGrid(
+            width=MODEL_PARAM["width"],
+            height=MODEL_PARAM["height"],
+            torus=False)
         self.ltc_schedule = SimultaneousActivation(self)
-        for _x, _y in product(range(width), range(height)):
+        for _x, _y in product(
+            range(MODEL_PARAM["width"]),
+            range(MODEL_PARAM["height"])
+        ):
             ltc = LatticeCell(
                 pos=(_x, _y),
                 in_stage=(_x, _y) in stage_region,
                 is_datapoint=(_x, _y) in datapoint,
-                model=self
-            )
+                model=self,)
             self.ltc_grid.place_agent(ltc, (_x, _y))
             self.ltc_schedule.add(ltc)
 
