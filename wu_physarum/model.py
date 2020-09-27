@@ -7,6 +7,7 @@ from mesa.space import SingleGrid
 from .agent import LatticeCell, Physarum
 from .lib.jsondeal import jsonreader
 from .lib.convex import convex_hull_inner
+from .lib.setting import MODEL_PARAM
 
 
 class WuPhysarum(Model):
@@ -14,7 +15,12 @@ class WuPhysarum(Model):
     モジホコリエージェントによるTSPソルバのモデル
     """
     def __init__(
-        self, width=200, height=200, density=0.5, filename=None, seed=None
+        self,
+        width=MODEL_PARAM["width"],
+        height=MODEL_PARAM["height"],
+        density=MODEL_PARAM["density"],
+        filename=MODEL_PARAM["filename"],
+        seed=MODEL_PARAM["seed"],
     ):
         """
         新しいTSPソルバを作る
