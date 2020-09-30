@@ -66,6 +66,13 @@ class WuPhysarum(Model):
         # start simulation
         self.running = True
 
+    def create_new_phy(self, pos):
+        phy = Physarum(
+            pos=pos,
+            model=self,)
+        self.phy_grid.place_agent(phy, pos)
+        self.phy_schedule.add(phy)
+
     def step(self):
         self.phy_schedule.step()
         self.ltc_schedule.step()
