@@ -28,8 +28,9 @@ class WuPhysarum(Model):
             seed: 乱数のシード値
         """
         # create stage
-        datapoint = jsonreader(MODEL_PARAM["filename"])
-        stage_region = convex_hull_inner(datapoint)
+        datapoint_pos = jsonreader(MODEL_PARAM["filename"])
+        stage_region = convex_hull_inner(datapoint_pos)
+        datapoint = self.create_datapoint(datapoint_pos)
 
         # create physarum agents
         self.phy_grid = SingleGrid(
@@ -65,6 +66,15 @@ class WuPhysarum(Model):
 
         # start simulation
         self.running = True
+
+    def create_datapoint(self, datapoint_pos):
+        datapoint = ()
+        for p in datapoint_pos:
+            for i, j in product(range(-1, 2), range(-1, 2)):
+                _pos = (p[0] + i, p[1] + j)
+                if 0 <= _pos[0] < MODEL_PARAM["width"] and 0 <= _pos[1] < MODEL_PARAM["height"]:
+                    datapoint.append(_pos)
+        return datapoint
 
     def create_new_phy(self, pos):
         phy = Physarum(
