@@ -122,8 +122,13 @@ class Physarum(Agent):
 
 
 class LatticeCell(Agent):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, pos, in_stage, is_datapoint, model):
+        super().__init__(pos, model)
+        self.pos = pos
+        self.in_stage = in_stage
+        self.is_datapoint = is_datapoint
+        self.trail = 0                    # Trail
+        self.chenu = 0                    # Chemo-nutrient
 
     def step(self):
         pass
