@@ -99,12 +99,12 @@ class Physarum(Agent):
             self.dir_id = (self.dir_id - 1) % 8
 
     def step(self):
-        """ Moving Step """
-        successfully_moved = self._move_forward()
-
         """ Sensing Step """
         Lweighted_value = self._get_weighted_value("LSENSOR")
         Rweighted_value = self._get_weighted_value("RSENSOR")
+
+        """ Moving Step """
+        successfully_moved = self._move_forward()
 
         """ Turning Step """
         self._turn(Lweighted_value, Rweighted_value, successfully_moved)
