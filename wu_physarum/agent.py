@@ -7,7 +7,6 @@ NINF = 1000000000
 
 _SENSOR_OFFSET = PHYSARUM_PARAM["sensor_arm_length"] // 2
 OFFSET = {
-    # TODO: 座標の取り方と正負の符号が合致しているか確かめる
     # [offset of x, offset of y]
 
     # NORTH
@@ -90,13 +89,13 @@ class Physarum(Agent):
 
     def _turn(self, Lweighted_value, Rweighted_value, successfully_moved):
         if successfully_moved is False:
-            self.dir_id = self.model.random.randint(0, 7)
+            self.dir_id = self.model.random.randint(0, 7)  # ランダムな方向を向く
         elif Lweighted_value is NINF and Rweighted_value is NINF:
-            self.dir_id = (self.dir_id + 4) % 8
+            self.dir_id = (self.dir_id + 4) % 8            # 真後ろを向く
         elif Lweighted_value < Rweighted_value:
-            self.dir_id = (self.dir_id + 1) % 8
+            self.dir_id = (self.dir_id + 1) % 8            # 右に曲がる
         elif Lweighted_value > Rweighted_value:
-            self.dir_id = (self.dir_id - 1) % 8
+            self.dir_id = (self.dir_id - 1) % 8            # 左に曲がる
 
     def step(self):
         """ Sensing Step """
@@ -114,7 +113,8 @@ class Physarum(Agent):
         if self.motion_counter > PHYSARUM_PARAM["RT"]:
             reproduction_pos = (
                 self.pos[0] - OFFSET[self.dir_id]["FORWARD"][0],
-                self.pos[1] - OFFSET[self.dir_id]["FORWARD"][1])
+                self.pos[1] - OFFSET[self.dir_id]["FORWARD"][1]
+            )
             self.model.create_new_phy(reproduction_pos)
         # Elimination
         if self.motion_counter < PHYSARUM_PARAM["ET"]:
@@ -131,6 +131,7 @@ class LatticeCell(Agent):
         self.chenu = 0                    # Chemo-nutrient
 
     def step(self):
+        # TODO: 伝搬について実装する
         pass
 
     def advance(self):
