@@ -30,19 +30,21 @@ class WuPhysarum(Model):
         # create stage
         datapoint_pos = jsonreader(MODEL_PARAM["filename"])
         stage_region = convex_hull_inner(datapoint_pos)
-        datapoint = self.create_datapoint(datapoint_pos)
+        datapoint_region = self.create_datapoint(datapoint_pos)
 
         # create physarum agents
         self.phy_grid = SingleGrid(
             width=MODEL_PARAM["width"],
             height=MODEL_PARAM["height"],
-            torus=False)
+            torus=False,
+        )
         self.phy_schedule = RandomActivation(self)
         for (_x, _y) in stage_region:
             if self.random.random() < MODEL_PARAM["density"]:
                 phy = Physarum(
                     pos=(_x, _y),
-                    model=self,)
+                    model=self,
+                )
                 self.phy_grid.place_agent(phy, (_x, _y))
                 self.phy_schedule.add(phy)
 
@@ -50,7 +52,8 @@ class WuPhysarum(Model):
         self.ltc_grid = SingleGrid(
             width=MODEL_PARAM["width"],
             height=MODEL_PARAM["height"],
-            torus=False)
+            torus=False,
+        )
         self.ltc_schedule = SimultaneousActivation(self)
         for _x, _y in product(
             range(MODEL_PARAM["width"]),
@@ -59,8 +62,9 @@ class WuPhysarum(Model):
             ltc = LatticeCell(
                 pos=(_x, _y),
                 in_stage=(_x, _y) in stage_region,
-                is_datapoint=(_x, _y) in datapoint,
-                model=self,)
+                is_datapoint=(_x, _y) in datapoint_region,
+                model=self,
+            )
             self.ltc_grid.place_agent(ltc, (_x, _y))
             self.ltc_schedule.add(ltc)
 
@@ -79,7 +83,8 @@ class WuPhysarum(Model):
     def create_new_phy(self, pos):
         phy = Physarum(
             pos=pos,
-            model=self,)
+            model=self,
+        )
         self.phy_grid.place_agent(phy, pos)
         self.phy_schedule.add(phy)
 
