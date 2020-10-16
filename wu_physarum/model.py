@@ -30,7 +30,7 @@ class WuPhysarum(Model):
         # create stage
         datapoint_pos = jsonreader(MODEL_PARAM["filename"])
         stage_region = convex_hull_inner(datapoint_pos)
-        datapoint_region = self.create_datapoint(datapoint_pos)
+        datapoint_region = self.create_datapoint_region(datapoint_pos)
 
         # create physarum agents
         self.phy_grid = SingleGrid(
