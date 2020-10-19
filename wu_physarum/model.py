@@ -1,8 +1,9 @@
 from itertools import product
 
 from mesa import Model
-from mesa.time import RandomActivation, SimultaneousActivation
+from mesa.time import RandomActivation, BaseScheduler
 from mesa.space import SingleGrid
+import numpy as np
 
 from .agent import LatticeCell, Physarum
 from .lib.jsondeal import jsonreader
@@ -33,7 +34,7 @@ class WuPhysarum(Model):
         # TODO: 将来的に、stage_regionはdatapoint_posとは独立して
         # 星形のstageとして作ることができるようにする。
         self.stage_region = convex_hull_inner(self.datapoint_pos)
-        self.datapoint_region = self.create_datapoint_region(self.datapoint_pos)
+        self.datapoint_region = self._create_datapoint_region(self.datapoint_pos)
 
         # create physarum agents
         self.phy_grid = SingleGrid(
@@ -57,7 +58,7 @@ class WuPhysarum(Model):
             height=MODEL_PARAM["height"],
             torus=False,
         )
-        self.ltc_schedule = SimultaneousActivation(self)
+        self.ltc_schedule = BaseScheduler(self)
         for _x, _y in product(
             range(MODEL_PARAM["width"]),
             range(MODEL_PARAM["height"])
@@ -74,7 +75,13 @@ class WuPhysarum(Model):
         # start simulation
         self.running = True
 
-    def create_datapoint_region(self, pos):
+        # create chenu map
+        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+
+        # create trail map
+        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+
+    def _create_datapoint_region(self, pos):
         datapoint_region = []
         for p in pos:
             for i, j in product(range(-1, 2), range(-1, 2)):
@@ -84,6 +91,9 @@ class WuPhysarum(Model):
         return tuple(datapoint_region)
 
     def create_new_phy(self, pos):
+        """
+        posで指定された場所に新たにphysarumエージェントを作成する
+        """
         phy = Physarum(
             pos=pos,
             model=self,
@@ -92,5 +102,10 @@ class WuPhysarum(Model):
         self.phy_schedule.add(phy)
 
     def step(self):
+        # モジホコリエージェントのステップ処理
         self.phy_schedule.step()
+
+        # 格子セルのステップ処理
+        # self.add_chenu_on_datapoint()
+        # convolve
         self.ltc_schedule.step()

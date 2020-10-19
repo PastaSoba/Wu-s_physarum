@@ -138,8 +138,6 @@ class LatticeCell(Agent):
         self.chenu = 0                    # Chemo-nutrient
 
     def step(self):
-        # TODO: 伝搬について実装する
-        pass
-
-    def advance(self):
+        # model.chenu_map, model.trail_mapにアクセスして、自セルの分の
+        # self.trail, self.chenuを更新する
         pass
