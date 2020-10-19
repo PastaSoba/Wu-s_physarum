@@ -72,13 +72,13 @@ class WuPhysarum(Model):
         self.running = True
 
     def create_datapoint_region(self, pos):
-        datapoint_region = ()
+        datapoint_region = []
         for p in pos:
             for i, j in product(range(-1, 2), range(-1, 2)):
                 _p = (p[0] + i, p[1] + j)
                 if 0 <= _p[0] < MODEL_PARAM["width"] and 0 <= _p[1] < MODEL_PARAM["height"]:
                     datapoint_region.append(_p)
-        return datapoint_region
+        return tuple(datapoint_region)
 
     def create_new_phy(self, pos):
         phy = Physarum(
