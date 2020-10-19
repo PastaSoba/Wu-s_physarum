@@ -54,7 +54,9 @@ class Physarum(Agent):
         self.dir_id = self.model.random.randint(0, 7)
         self.motion_counter = 0
 
-    def _move_forward(self):
+        self._is_successfully_moved = False
+
+    def move_forward(self):
         forward_pos = (
             self.pos[0] + OFFSET[self.dir_id]["FORWARD"][0],
             self.pos[1] + OFFSET[self.dir_id]["FORWARD"][1]
@@ -66,12 +68,15 @@ class Physarum(Agent):
             ltc.trail += PHYSARUM_PARAM["depT"]
             # 2. agent moves forward
             self.model.phy_grid.move_agent(self, forward_pos)
-            return True
+            self._is_successfully_moved = True
         else:
             # If agent CANNOT move forward successfully,
             # subtract 1 from self motion counter.
             self.motion_counter -= 1
-            return False
+            self._is_successfully_moved = False
+
+    def _get_is_successfully_moved(self):
+        return self._is_successfully_moved
 
     def _get_weighted_value(self, sensor):
         sensing_pos = (
@@ -87,15 +92,15 @@ class Physarum(Agent):
             + sensing_cell.chenu * PHYSARUM_PARAM["WN"]
             return weighted_value
 
-    def _turn(self, Lweighted_value, Rweighted_value, successfully_moved):
-        if successfully_moved is False:
-            self.dir_id = self.model.random.randint(0, 7)  # ランダムな方向を向く
+    def _get_new_dir_id(self, Lweighted_value, Rweighted_value, is_successfully_moved):
+        if is_successfully_moved is False:
+            return self.model.random.randint(0, 7)  # ランダムな方向を向く
         elif Lweighted_value is NINF and Rweighted_value is NINF:
-            self.dir_id = (self.dir_id + 4) % 8            # 真後ろを向く
+            return (self.dir_id + 4) % 8            # 真後ろを向く
         elif Lweighted_value < Rweighted_value:
-            self.dir_id = (self.dir_id + 1) % 8            # 右に曲がる
+            return (self.dir_id + 1) % 8            # 右に曲がる
         elif Lweighted_value > Rweighted_value:
-            self.dir_id = (self.dir_id - 1) % 8            # 左に曲がる
+            return (self.dir_id - 1) % 8            # 左に曲がる
 
     def step(self):
         """ Sensing Step """
@@ -103,10 +108,12 @@ class Physarum(Agent):
         Rweighted_value = self._get_weighted_value("RSENSOR")
 
         """ Moving Step """
-        successfully_moved = self._move_forward()
+        self.move_forward()
+        is_successfully_moved = self._get_is_successfully_moved()
 
         """ Turning Step """
-        self._turn(Lweighted_value, Rweighted_value, successfully_moved)
+        new_dir_id = self._get_new_dir_id(Lweighted_value, Rweighted_value, is_successfully_moved)
+        self.dir_id = new_dir_id
 
         """ Reproduct/Elimination Step"""
         # Reproduct
