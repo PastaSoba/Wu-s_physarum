@@ -16,6 +16,7 @@ class WuPhysarum(Model):
     """
     def __init__(
         self,
+        filename,
         seed=MODEL_PARAM["seed"],
     ):
         """
@@ -28,9 +29,11 @@ class WuPhysarum(Model):
             seed: 乱数のシード値
         """
         # create stage
-        datapoint_pos = jsonreader(MODEL_PARAM["filename"])
-        stage_region = convex_hull_inner(datapoint_pos)
-        datapoint_region = self.create_datapoint_region(datapoint_pos)
+        self.datapoint_pos = jsonreader(filename)
+        # TODO: 将来的に、stage_regionはdatapoint_posとは独立して
+        # 星形のstageとして作ることができるようにする。
+        self.stage_region = convex_hull_inner(self.datapoint_pos)
+        self.datapoint_region = self.create_datapoint_region(self.datapoint_pos)
 
         # create physarum agents
         self.phy_grid = SingleGrid(
@@ -39,7 +42,7 @@ class WuPhysarum(Model):
             torus=False,
         )
         self.phy_schedule = RandomActivation(self)
-        for (_x, _y) in stage_region:
+        for (_x, _y) in self.stage_region:
             if self.random.random() < MODEL_PARAM["density"]:
                 phy = Physarum(
                     pos=(_x, _y),
@@ -61,8 +64,8 @@ class WuPhysarum(Model):
         ):
             ltc = LatticeCell(
                 pos=(_x, _y),
-                in_stage=(_x, _y) in stage_region,
-                is_datapoint=(_x, _y) in datapoint_region,
+                in_stage=(_x, _y) in self.stage_region,
+                is_datapoint=(_x, _y) in self.datapoint_region,
                 model=self,
             )
             self.ltc_grid.place_agent(ltc, (_x, _y))
