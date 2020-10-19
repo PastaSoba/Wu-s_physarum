@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import json
 
 
@@ -5,11 +7,14 @@ def jsonreader(filename):
     """
     jsonファイルから座標の組を読み込む
     usuage:
-        jsonreader("resource/test.json")
+        jsonreader("test.json")
         -> ((100, 100), (200, 200), (300, 300))
     """
+    path = Path(__file__).parent.parent
+    path /= 'resource/'
+
     try:
-        with open(filename) as f:
+        with open(os.path.join(path, filename)) as f:
             datas = json.load(f)
 
             coords = []
