@@ -1,38 +1,29 @@
 from operator import add
 from math import sin, cos, radians
 
-from .convex import (
-    convex_hull_vertex,
-    convex_hull_edge,
-    convex_hull_inner
-)
+from .convex import convex_hull_inner
+from .setting import MODEL_PARAM
 
 
-class Stage:
+class StarStage:
     """
     スター型のステージを作るための自作ライブラリ
-    Stage(10, 3) =
-    [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
     """
-    def __init__(self, width: int, height: int) -> None:
-        self.width = width
-        self.height = height
-        self.stage = [[0 for i in range(width)] for j in range(height)]
+    def __init__(self) -> None:
+        self.stage = [[0 for j in range(MODEL_PARAM["height"])] for i in range(MODEL_PARAM["width"])]
 
     def select(self, x: int, y: int) -> None:
         """
-        turn to self.stage[y][x] == 1
+        turn to self.stage[x][y] == 1
         """
-        self.stage[y][x] = 1
+        self.stage[x][y] = 1
 
     def draw_circle(self, x: int, y: int, radius: int) -> None:
         """
         (x, y) を中心とした半径 radius の円の領域内の値を1にセットする
         """
-        for i in range(self.width):
-            for j in range(self.height):
+        for i in range(MODEL_PARAM["width"]):
+            for j in range(MODEL_PARAM["height"]):
                 if (i - x)**2 + (j - y)**2 <= radius**2:
                     self.select(i, j)
 
@@ -53,33 +44,13 @@ class Stage:
         # 整数化とタプル化
         vertex = tuple([tuple(map(round, v)) for v in vertex])
         # vertexを反時計回りに並べ替える
-        vertex = convex_hull_vertex(vertex)
-        edge_point = convex_hull_edge(vertex)
-        inner_point = convex_hull_inner(edge_point)
+        inner_point = convex_hull_inner(vertex)
         for i, j in inner_point:
             self.select(i, j)
 
     def __str__(self):
+        print("cells are indexed by [x][y]")
         return "\n".join(map(str, self.stage))
 
     def get(self):
         return self.stage
-
-
-if __name__ == "__main__":
-    import seaborn as sns
-    import matplotlib.pyplot as plt
-
-    pivot = (100, 100)
-    radius = 30
-    branch = 12
-
-    # スター型のステージを作成するデモ
-    stage1 = Stage(200, 200)
-    stage1.draw_circle(pivot[0], pivot[1], radius)
-    for b in range(branch):
-        stage1.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
-
-    plt.figure()
-    sns.heatmap(stage1.get())
-    plt.show()
