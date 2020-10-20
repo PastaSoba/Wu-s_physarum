@@ -1,6 +1,6 @@
 from mesa import Agent
 
-from .lib.setting import MODEL_PARAM, PHYSARUM_PARAM, LATTICECELL_PARAM
+from .lib.setting import PHYSARUM_PARAM
 
 
 NINF = 1000000000
@@ -64,8 +64,7 @@ class Physarum(Agent):
         if self.model.phy_grid.is_cell_empty(self, forward_pos):
             # If agent CAN move forward successfully,
             # 1. deposit trail on now position
-            ltc = self.model.ltc_grid.get_cell_list_contents([self.pos])[0]
-            ltc.trail += PHYSARUM_PARAM["depT"]
+            self.model.trail_map[self.pos[0], self.pos[1]] += PHYSARUM_PARAM["depT"]
             # 2. agent moves forward
             self.model.phy_grid.move_agent(self, forward_pos)
             self._is_successfully_moved = True
@@ -86,10 +85,11 @@ class Physarum(Agent):
         if self.model.phy_grid.out_of_bounds(sensing_pos):
             return NINF
         else:
-            sensing_cell = self.model.ltc_grid.get_cell_list_contents(
-                sensing_pos)[0]
-            weighted_value = sensing_cell.trail * PHYSARUM_PARAM["WT"]
-            + sensing_cell.chenu * PHYSARUM_PARAM["WN"]
+            sensing_cell_trail = self.model.trail_map[sensing_pos[0], sensing_pos[1]]
+            sensing_cell_chenu = self.model.chenu_map[sensing_pos[0], sensing_pos[1]]
+
+            weighted_value = sensing_cell_trail * PHYSARUM_PARAM["WT"]
+            + sensing_cell_chenu * PHYSARUM_PARAM["WN"]
             return weighted_value
 
     def _get_new_dir_id(self, Lweighted_value, Rweighted_value, is_successfully_moved):
@@ -126,18 +126,3 @@ class Physarum(Agent):
         # Elimination
         if self.motion_counter < PHYSARUM_PARAM["ET"]:
             self.model.phy_grid.remove_agent(self)
-
-
-class LatticeCell(Agent):
-    def __init__(self, pos, in_stage, is_datapoint, model):
-        super().__init__(pos, model)
-        self.pos = pos
-        self.in_stage = in_stage
-        self.is_datapoint = is_datapoint
-        self.trail = 0                    # Trail
-        self.chenu = 0                    # Chemo-nutrient
-
-    def step(self):
-        # model.chenu_map, model.trail_mapにアクセスして、自セルの分の
-        # self.trail, self.chenuを更新する
-        pass

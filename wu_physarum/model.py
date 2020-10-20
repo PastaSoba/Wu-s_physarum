@@ -1,14 +1,15 @@
 from itertools import product
 
 from mesa import Model
-from mesa.time import RandomActivation, BaseScheduler
+from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 import numpy as np
+from scipy import signal
 
-from .agent import LatticeCell, Physarum
+from .agent import Physarum
 from .lib.jsondeal import jsonreader
 from .lib.convex import convex_hull_inner
-from .lib.setting import MODEL_PARAM
+from .lib.setting import MODEL_PARAM, LATTICECELL_PARAM
 
 
 class WuPhysarum(Model):
@@ -29,12 +30,14 @@ class WuPhysarum(Model):
             filename: データポイントを表したファイル
             seed: 乱数のシード値
         """
-        # create stage
+        # create stage including Lattice Cells
         self.datapoint_pos = jsonreader(filename)
         # TODO: 将来的に、stage_regionはdatapoint_posとは独立して
         # 星形のstageとして作ることができるようにする。
         self.stage_region = convex_hull_inner(self.datapoint_pos)
         self.datapoint_region = self._create_datapoint_region(self.datapoint_pos)
+        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
         # create physarum agents
         self.phy_grid = SingleGrid(
@@ -52,34 +55,8 @@ class WuPhysarum(Model):
                 self.phy_grid.place_agent(phy, (_x, _y))
                 self.phy_schedule.add(phy)
 
-        # create lattice cell agents
-        self.ltc_grid = SingleGrid(
-            width=MODEL_PARAM["width"],
-            height=MODEL_PARAM["height"],
-            torus=False,
-        )
-        self.ltc_schedule = BaseScheduler(self)
-        for _x, _y in product(
-            range(MODEL_PARAM["width"]),
-            range(MODEL_PARAM["height"])
-        ):
-            ltc = LatticeCell(
-                pos=(_x, _y),
-                in_stage=(_x, _y) in self.stage_region,
-                is_datapoint=(_x, _y) in self.datapoint_region,
-                model=self,
-            )
-            self.ltc_grid.place_agent(ltc, (_x, _y))
-            self.ltc_schedule.add(ltc)
-
         # start simulation
         self.running = True
-
-        # create chenu map
-        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-
-        # create trail map
-        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
     def _create_datapoint_region(self, pos):
         datapoint_region = []
@@ -106,6 +83,20 @@ class WuPhysarum(Model):
         self.phy_schedule.step()
 
         # 格子セルのステップ処理
-        # self.add_chenu_on_datapoint()
-        # convolve
-        self.ltc_schedule.step()
+        # Add chenu on datapoint
+        for (x, y) in self.datapoint_region:
+            self.chenu_map[x, y] += LATTICECELL_PARAM["CN"]
+        # Applying average filter on chenu_map
+        cnf_w, cnf_h, dampN = (
+            LATTICECELL_PARAM["filterN_width"],
+            LATTICECELL_PARAM["filterN_height"],
+            LATTICECELL_PARAM["dampN"])
+        cnf = np.fill((cnf_w, cnf_h), (1 - dampN) / (cnf_w * cnf_h))
+        self.chenu_map = signal.convolve2d(self.chenu_map, cnf)
+        # Applying average filter on trail_map
+        trf_w, trf_h, dampT = (
+            LATTICECELL_PARAM["filterT_width"],
+            LATTICECELL_PARAM["filterT_height"],
+            LATTICECELL_PARAM["dampT"])
+        trf = np.fill((trf_w, trf_h), (1 - dampT) / (trf_w * trf_h))
+        self.trail_map = signal.convolve2d(self.trail_map, trf)
