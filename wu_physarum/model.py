@@ -30,12 +30,14 @@ class WuPhysarum(Model):
             filename: データポイントを表したファイル
             seed: 乱数のシード値
         """
-        # create stage including Lattice Cells
-        self.datapoint_pos = jsonreader(filename)
-        # TODO: 将来的に、stage_regionはdatapoint_posとは独立して
+        # read datapoint position
+        self._datapoint_pos = jsonreader(filename)
+
+        # create stage including Lattice Cells function
+        # TODO: 将来的に、stage_regionは_datapoint_posとは独立して
         # 星形のstageとして作ることができるようにする。
-        self.stage_region = coords2ndarray(convex_hull_inner(self.datapoint_pos))
-        self.datapoint_region = coords2ndarray(self._create_datapoint_region(self.datapoint_pos))
+        self.stage_region = coords2ndarray(convex_hull_inner(self._datapoint_pos))
+        self.datapoint_region = coords2ndarray(self._create_datapoint_region(self._datapoint_pos))
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
