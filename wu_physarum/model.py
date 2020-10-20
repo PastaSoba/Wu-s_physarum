@@ -8,7 +8,7 @@ from scipy import signal
 
 from .agent import Physarum
 from .lib.jsondeal import jsonreader
-from .lib.convex import convex_hull_inner
+from .lib.convex import convex_hull_inner, coords2ndarray
 from .lib.setting import MODEL_PARAM, LATTICECELL_PARAM
 
 
@@ -34,8 +34,8 @@ class WuPhysarum(Model):
         self.datapoint_pos = jsonreader(filename)
         # TODO: 将来的に、stage_regionはdatapoint_posとは独立して
         # 星形のstageとして作ることができるようにする。
-        self.stage_region = convex_hull_inner(self.datapoint_pos)
-        self.datapoint_region = self._create_datapoint_region(self.datapoint_pos)
+        self.stage_region = coords2ndarray(convex_hull_inner(self.datapoint_pos))
+        self.datapoint_region = coords2ndarray(self._create_datapoint_region(self.datapoint_pos))
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
@@ -46,14 +46,28 @@ class WuPhysarum(Model):
             torus=False,
         )
         self.phy_schedule = RandomActivation(self)
-        for (_x, _y) in self.stage_region:
-            if self.random.random() < MODEL_PARAM["density"]:
-                phy = Physarum(
-                    pos=(_x, _y),
-                    model=self,
-                )
-                self.phy_grid.place_agent(phy, (_x, _y))
-                self.phy_schedule.add(phy)
+        for x, _row in enumerate(self.stage_region):
+            for y, is_in_stage in enumerate(_row):
+                if is_in_stage and self.random.random() < MODEL_PARAM["density"]:
+                    phy = Physarum(
+                        pos=(x, y),
+                        model=self,
+                    )
+                    self.phy_grid.place_agent(phy, (x, y))
+                    self.phy_schedule.add(phy)
+
+        # create filter
+        self.cnf_w, self.cnf_h, self.dampN = (
+            LATTICECELL_PARAM["filterN_width"],
+            LATTICECELL_PARAM["filterN_height"],
+            LATTICECELL_PARAM["dampN"])
+        self.cnf = np.fill((self.cnf_w, self.cnf_h), (1 - self.dampN) / (self.cnf_w * self.cnf_h))
+
+        self.trf_w, self.trf_h, self.dampT = (
+            LATTICECELL_PARAM["filterT_width"],
+            LATTICECELL_PARAM["filterT_height"],
+            LATTICECELL_PARAM["dampT"])
+        self.trf = np.fill((self.trf_w, self.trf_h), (1 - self.dampT) / (self.trf_w * self.trf_h))
 
         # start simulation
         self.running = True
@@ -84,19 +98,8 @@ class WuPhysarum(Model):
 
         # 格子セルのステップ処理
         # Add chenu on datapoint
-        for (x, y) in self.datapoint_region:
-            self.chenu_map[x, y] += LATTICECELL_PARAM["CN"]
+        self.chenu_map += LATTICECELL_PARAM["CN"] * self.datapoint_region
         # Applying average filter on chenu_map
-        cnf_w, cnf_h, dampN = (
-            LATTICECELL_PARAM["filterN_width"],
-            LATTICECELL_PARAM["filterN_height"],
-            LATTICECELL_PARAM["dampN"])
-        cnf = np.fill((cnf_w, cnf_h), (1 - dampN) / (cnf_w * cnf_h))
-        self.chenu_map = signal.convolve2d(self.chenu_map, cnf)
+        self.chenu_map = signal.convolve2d(self.chenu_map, self.cnf)
         # Applying average filter on trail_map
-        trf_w, trf_h, dampT = (
-            LATTICECELL_PARAM["filterT_width"],
-            LATTICECELL_PARAM["filterT_height"],
-            LATTICECELL_PARAM["dampT"])
-        trf = np.fill((trf_w, trf_h), (1 - dampT) / (trf_w * trf_h))
-        self.trail_map = signal.convolve2d(self.trail_map, trf)
+        self.trail_map = signal.convolve2d(self.trail_map, self.trf)

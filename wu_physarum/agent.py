@@ -61,10 +61,10 @@ class Physarum(Agent):
             self.pos[0] + OFFSET[self.dir_id]["FORWARD"][0],
             self.pos[1] + OFFSET[self.dir_id]["FORWARD"][1]
         )
-        if self.model.phy_grid.is_cell_empty(self, forward_pos):
+        if self.model.phy_grid.is_cell_empty(self, forward_pos) and self.model.stage_region[forward_pos]:
             # If agent CAN move forward successfully,
             # 1. deposit trail on now position
-            self.model.trail_map[self.pos[0], self.pos[1]] += PHYSARUM_PARAM["depT"]
+            self.model.trail_map[self.pos] += PHYSARUM_PARAM["depT"]
             # 2. agent moves forward
             self.model.phy_grid.move_agent(self, forward_pos)
             self._is_successfully_moved = True
@@ -82,11 +82,11 @@ class Physarum(Agent):
             self.pos[0] + OFFSET[self.dir_id][sensor][0],
             self.pos[1] + OFFSET[self.dir_id][sensor][1]
         )
-        if self.model.phy_grid.out_of_bounds(sensing_pos):
+        if self.model.phy_grid.out_of_bounds(sensing_pos) or self.model.stage_region[sensing_pos] is False:
             return NINF
         else:
-            sensing_cell_trail = self.model.trail_map[sensing_pos[0], sensing_pos[1]]
-            sensing_cell_chenu = self.model.chenu_map[sensing_pos[0], sensing_pos[1]]
+            sensing_cell_trail = self.model.trail_map[sensing_pos]
+            sensing_cell_chenu = self.model.chenu_map[sensing_pos]
 
             weighted_value = sensing_cell_trail * PHYSARUM_PARAM["WT"]
             + sensing_cell_chenu * PHYSARUM_PARAM["WN"]
