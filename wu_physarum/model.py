@@ -4,6 +4,7 @@ from mesa import Model
 from mesa.time import RandomActivation
 from mesa.space import SingleGrid
 import numpy as np
+from scipy import signal
 
 from .agent import Physarum
 from .lib.jsondeal import jsonreader
@@ -83,4 +84,19 @@ class WuPhysarum(Model):
 
         # 格子セルのステップ処理
         # Add chenu on datapoint
-        # convolve
+        for (x, y) in self.datapoint_region:
+            self.chenu_map[x, y] += LATTICECELL_PARAM["CN"]
+        # Applying average filter on chenu_map
+        cnf_w, cnf_h, dampN = (
+            LATTICECELL_PARAM["filterN_width"],
+            LATTICECELL_PARAM["filterN_height"],
+            LATTICECELL_PARAM["dampN"])
+        cnf = np.fill((cnf_w, cnf_h), (1 - dampN) / (cnf_w * cnf_h))
+        self.chenu_map = signal.convolve2d(self.chenu_map, cnf)
+        # Applying average filter on trail_map
+        trf_w, trf_h, dampT = (
+            LATTICECELL_PARAM["filterT_width"],
+            LATTICECELL_PARAM["filterT_height"],
+            LATTICECELL_PARAM["dampT"])
+        trf = np.fill((trf_w, trf_h), (1 - dampT) / (trf_w * trf_h))
+        self.trail_map = signal.convolve2d(self.trail_map, trf)
