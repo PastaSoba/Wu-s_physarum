@@ -49,9 +49,9 @@ if __name__ == "__main__":
 
     """ model.pyのstage_region, datapoint_regionの確認 """
     jsonfile = "test.json"
-    # wu_physarum = WuPhysarum(filename=jsonfile, seed=0)
-    # visualize(wu_physarum.stage_region, True)
-    # visualize(wu_physarum.datapoint_region, True)
+    wu_physarum = WuPhysarum(filename=jsonfile, seed=0)
+    visualize(wu_physarum.stage_region, is_plotted_only_True_points=False)
+    visualize(wu_physarum.datapoint_region, is_plotted_only_True_points=False)
 
     """ スター型のステージを作成するデモ """
     pivot = (100, 100)
@@ -61,4 +61,4 @@ if __name__ == "__main__":
     starstage.draw_circle(pivot[0], pivot[1], radius)
     for b in range(branch):
         starstage.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
-    visualize(starstage.get(), False)
+    visualize(starstage.get(), is_plotted_only_True_points=False)
