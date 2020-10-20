@@ -3,7 +3,7 @@ from mesa import Agent
 from .lib.setting import PHYSARUM_PARAM
 
 
-NINF = 1000000000
+NINF = -1000000000
 
 _SENSOR_OFFSET = PHYSARUM_PARAM["sensor_arm_length"] // 2
 OFFSET = {
