@@ -42,12 +42,12 @@ class WuPhysarum(Model):
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
         # create physarum agents
-        self.phy_grid = SingleGrid(
+        self.grid = SingleGrid(
             width=MODEL_PARAM["width"],
             height=MODEL_PARAM["height"],
             torus=False,
         )
-        self.phy_schedule = RandomActivation(self)
+        self.schedule = RandomActivation(self)
         for x, _row in enumerate(self.stage_region):
             for y, is_in_stage in enumerate(_row):
                 if is_in_stage and self.random.random() < MODEL_PARAM["density"]:
@@ -55,8 +55,8 @@ class WuPhysarum(Model):
                         pos=(x, y),
                         model=self,
                     )
-                    self.phy_grid.place_agent(phy, (x, y))
-                    self.phy_schedule.add(phy)
+                    self.grid.place_agent(phy, (x, y))
+                    self.schedule.add(phy)
 
         # create filter
         self.cnf_w, self.cnf_h, self.dampN = (
@@ -91,12 +91,12 @@ class WuPhysarum(Model):
             pos=pos,
             model=self,
         )
-        self.phy_grid.place_agent(phy, pos)
-        self.phy_schedule.add(phy)
+        self.grid.place_agent(phy, pos)
+        self.schedule.add(phy)
 
     def step(self):
         # モジホコリエージェントのステップ処理
-        self.phy_schedule.step()
+        self.schedule.step()
 
         # 格子セルのステップ処理
         # Add chenu on datapoint
