@@ -100,9 +100,9 @@ class WuPhysarum(Model):
 
         # 格子セルのステップ処理
         # Applying average filter on trail_map
-        self.trail_map = signal.convolve2d(self.trail_map, self.trf)
+        self.trail_map = signal.convolve2d(self.trail_map, self.trf, mode="same")
         # Applying average filter on whole chenu_map
-        self.chenu_map = signal.convolve2d(self.chenu_map, self.cnf)
+        self.chenu_map = signal.convolve2d(self.chenu_map, self.cnf, mode="same")
         # Exclude filter effect in datapoint region
         self.chenu_map *= 1 - self.datapoint_region
         # Add chenu (timed by steps) on datapoint
