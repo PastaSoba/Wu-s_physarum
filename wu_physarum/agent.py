@@ -48,8 +48,11 @@ class Physarum(Agent):
     """
     モジホコリエージェント
     """
+    unique_id = 1
+
     def __init__(self, pos, model):
-        super().__init__(pos, model)
+        super().__init__(Physarum.unique_id, model)
+        Physarum.unique_id += 1
         self.pos = pos
         self.dir_id = self.model.random.randint(0, 7)
         self.motion_counter = 0
