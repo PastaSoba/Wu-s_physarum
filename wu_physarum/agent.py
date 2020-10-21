@@ -70,6 +70,8 @@ class Physarum(Agent):
             self.model.trail_map[self.pos] += PHYSARUM_PARAM["depT"]
             # 2. agent moves forward
             self.model.grid.move_agent(self, forward_pos)
+            # add 1 to self motion counter.
+            self.motion_counter += 1
             self._is_successfully_moved = True
         else:
             # If agent CANNOT move forward successfully,
