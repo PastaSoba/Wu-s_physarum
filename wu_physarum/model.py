@@ -63,13 +63,13 @@ class WuPhysarum(Model):
             LATTICECELL_PARAM["filterN_width"],
             LATTICECELL_PARAM["filterN_height"],
             LATTICECELL_PARAM["dampN"])
-        self.cnf = np.fill((self.cnf_w, self.cnf_h), (1 - self.dampN) / (self.cnf_w * self.cnf_h))
+        self.cnf = np.full((self.cnf_w, self.cnf_h), (1 - self.dampN) / (self.cnf_w * self.cnf_h))
 
         self.trf_w, self.trf_h, self.dampT = (
             LATTICECELL_PARAM["filterT_width"],
             LATTICECELL_PARAM["filterT_height"],
             LATTICECELL_PARAM["dampT"])
-        self.trf = np.fill((self.trf_w, self.trf_h), (1 - self.dampT) / (self.trf_w * self.trf_h))
+        self.trf = np.full((self.trf_w, self.trf_h), (1 - self.dampT) / (self.trf_w * self.trf_h))
 
         # start simulation
         self.running = True
