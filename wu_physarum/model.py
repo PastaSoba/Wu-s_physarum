@@ -99,9 +99,11 @@ class WuPhysarum(Model):
         self.schedule.step()
 
         # 格子セルのステップ処理
-        # Add chenu on datapoint
-        self.chenu_map += LATTICECELL_PARAM["CN"] * self.datapoint_region
-        # Applying average filter on chenu_map
-        self.chenu_map = signal.convolve2d(self.chenu_map, self.cnf)
         # Applying average filter on trail_map
         self.trail_map = signal.convolve2d(self.trail_map, self.trf)
+        # Applying average filter on whole chenu_map
+        self.chenu_map = signal.convolve2d(self.chenu_map, self.cnf)
+        # Exclude filter effect in datapoint region
+        self.chenu_map *= 1 - self.datapoint_region
+        # Add chenu (timed by steps) on datapoint
+        self.chenu_map += LATTICECELL_PARAM["CN"] * self.datapoint_region * self.schedule.steps
