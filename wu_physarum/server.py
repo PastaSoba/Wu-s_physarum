@@ -23,7 +23,7 @@ class CustomCanvasGrid(CanvasGrid):
     # CHANGED: render関数の動作を軽量化した
     def render(self, model):
         grid_state = defaultdict(list)
-        for agt in model.schedule.agents():
+        for agt in model.schedule.agents:
             portrayal = self.portrayal_method(agt)
             if portrayal:
                 portrayal["x"] = agt.pos[0]
