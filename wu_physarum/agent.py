@@ -54,7 +54,7 @@ class Physarum(Agent):
         super().__init__(Physarum.unique_id, model)
         Physarum.unique_id += 1
         self.pos = pos
-        self.dir_id = self.model.random.randint(0, 7)
+        self.dir_id = self.random.randint(0, 7)
         self.motion_counter = 0
 
         self._is_successfully_moved = False
@@ -97,7 +97,7 @@ class Physarum(Agent):
 
     def _get_new_dir_id(self, Lweighted_value, Rweighted_value, is_successfully_moved):
         if is_successfully_moved is False:
-            return self.model.random.randint(0, 7)  # ランダムな方向を向く
+            return self.random.randint(0, 7)        # ランダムな方向を向く
         elif Lweighted_value is NINF and Rweighted_value is NINF:
             return (self.dir_id + 4) % 8            # 真後ろを向く
         elif Lweighted_value < Rweighted_value:
