@@ -83,17 +83,6 @@ class WuPhysarum(Model):
                     datapoint_region.append(_p)
         return tuple(datapoint_region)
 
-    def create_new_phy(self, pos):
-        """
-        posで指定された場所に新たにphysarumエージェントを作成する
-        """
-        phy = Physarum(
-            pos=pos,
-            model=self,
-        )
-        self.grid.place_agent(phy, pos)
-        self.schedule.add(phy)
-
     def step(self):
         # モジホコリエージェントのステップ処理
         self.schedule.step()

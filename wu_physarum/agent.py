@@ -128,8 +128,10 @@ class Physarum(Agent):
 
         """ Reproduct/Elimination Step"""
         # Reproduct
-        if self.motion_counter > PHYSARUM_PARAM["RT"]:
-            self.model.create_new_phy(_reproduction_pos)
+        if self.motion_counter > PHYSARUM_PARAM["RT"] and is_successfully_moved:
+            chrone = Physarum(pos=_reproduction_pos, model=self.model)
+            self.model.grid.place_agent(chrone, _reproduction_pos)
+            self.model.schedule.add(chrone)
         # Elimination
         if self.motion_counter < PHYSARUM_PARAM["ET"]:
             self.model.grid.remove_agent(self)
