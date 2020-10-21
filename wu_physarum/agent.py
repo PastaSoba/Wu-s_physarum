@@ -111,6 +111,9 @@ class Physarum(Agent):
             return self.dir_id                      # 直進する
 
     def step(self):
+        # Memory self position for reproduction step before move or rotate
+        _reproduction_pos = self.pos
+
         """ Sensing Step """
         Lweighted_value = self._get_weighted_value("LSENSOR")
         Rweighted_value = self._get_weighted_value("RSENSOR")
@@ -126,11 +129,7 @@ class Physarum(Agent):
         """ Reproduct/Elimination Step"""
         # Reproduct
         if self.motion_counter > PHYSARUM_PARAM["RT"]:
-            reproduction_pos = (
-                self.pos[0] - OFFSET[self.dir_id]["FORWARD"][0],
-                self.pos[1] - OFFSET[self.dir_id]["FORWARD"][1]
-            )
-            self.model.create_new_phy(reproduction_pos)
+            self.model.create_new_phy(_reproduction_pos)
         # Elimination
         if self.motion_counter < PHYSARUM_PARAM["ET"]:
             self.model.grid.remove_agent(self)
