@@ -134,3 +134,4 @@ class Physarum(Agent):
         # Elimination
         if self.motion_counter < PHYSARUM_PARAM["ET"]:
             self.model.grid.remove_agent(self)
+            self.model.schedule.remove(self)
