@@ -104,6 +104,9 @@ class Physarum(Agent):
             return (self.dir_id + 1) % 8            # 右に曲がる
         elif Lweighted_value > Rweighted_value:
             return (self.dir_id - 1) % 8            # 左に曲がる
+        else:
+            # if Lweighted_value == Rweighted_value
+            return self.dir_id                      # 直進する
 
     def step(self):
         """ Sensing Step """
