@@ -18,7 +18,7 @@ class WuPhysarum(Model):
     """
     def __init__(
         self,
-        filename,
+        datapoint_filename,
         seed=MODEL_PARAM["seed"],
     ):
         """
@@ -27,11 +27,11 @@ class WuPhysarum(Model):
         Args:
             height, width: 空間のサイズ(pixel)
             density: モジホコリエージェントの発生密度(0~1.0)
-            filename: データポイントを表したファイル
+            datapoint_filename: データポイントを表したファイル
             seed: 乱数のシード値
         """
         # read datapoint position
-        self._datapoint_pos = jsonreader(filename)
+        self._datapoint_pos = jsonreader(datapoint_filename)
 
         # create stage including Lattice Cells function
         # TODO: 将来的に、stage_regionは_datapoint_posとは独立して

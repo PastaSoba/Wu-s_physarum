@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 
 
-def jsonreader(filename):
+def jsonreader(datapoint_filename):
     """
     jsonファイルから座標の組を読み込む
     usuage:
@@ -14,7 +14,7 @@ def jsonreader(filename):
     path /= 'resource/'
 
     try:
-        with open(os.path.join(path, filename)) as f:
+        with open(os.path.join(path, datapoint_filename)) as f:
             datas = json.load(f)
 
             coords = []
