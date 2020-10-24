@@ -3,13 +3,13 @@ import numpy as np
 from .setting import MODEL_PARAM
 
 
-def _convex_hull_vertex(points):
+def __convex_hull_vertex(points):
     """jsonファイルにある2次元座標群で構成できる凸包の頂点群を計算する
     Input: 頂点座標のタプル ((x_1, y_1), (x_2, y_2), ...)
     Output: x座標が最小の頂点から反時計回りにめぐった凸包の頂点
     Implements Andrew's monotone chain algorithm. O(n log n) complexity.
     """
-    # https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/_convex_hull/Monotone_chain#Python
+    # https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/__convex_hull/Monotone_chain#Python
     # より引用
 
     # Sort the points lexicographically (tuples are compared lexicographically).
@@ -45,7 +45,7 @@ def _convex_hull_vertex(points):
     return tuple(lower[:-1] + upper[:-1])
 
 
-def _point_on_edge(p1, p2):
+def __point_on_edge(p1, p2):
     """
     2点間をつなぐ線分上にある格子点を返す。
     Input: 2点の座標のタプル
@@ -74,7 +74,7 @@ def _point_on_edge(p1, p2):
     return points
 
 
-def _convex_hull_edge(points):
+def __convex_hull_edge(points):
     """
     凸包の辺上にある格子点を返す。
     Input: 凸包の頂点座標群（反時計回りにならべてあること）
@@ -82,11 +82,11 @@ def _convex_hull_edge(points):
     """
     edge_point = []
     for i in range(len(points)):
-        edge_point.extend(_point_on_edge(points[i], points[i - 1]))
+        edge_point.extend(__point_on_edge(points[i], points[i - 1]))
     return tuple(sorted(set(edge_point)))
 
 
-def _convex_hull_inner(points):
+def __convex_hull_inner(points):
     """
     凸包の内部（辺上も含む）にある格子点を返す。
     Input: 凸包の辺上にある格子点群
@@ -114,7 +114,7 @@ def convex_hull_inner(points):
     Output: 凸包の内部（辺上も含む）にある格子点群
     Implements Andrew's monotone chain algorithm. O(n log n) complexity.
     """
-    return _convex_hull_inner(_convex_hull_edge(_convex_hull_vertex(points)))
+    return __convex_hull_inner(__convex_hull_edge(__convex_hull_vertex(points)))
 
 
 def coords2ndarray(coords):
