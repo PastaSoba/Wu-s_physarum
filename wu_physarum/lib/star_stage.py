@@ -10,13 +10,13 @@ class StarStage:
     スター型のステージを作るための自作ライブラリ
     """
     def __init__(self) -> None:
-        self.stage = [[0 for j in range(MODEL_PARAM["height"])] for i in range(MODEL_PARAM["width"])]
+        self.__stage = [[0 for j in range(MODEL_PARAM["height"])] for i in range(MODEL_PARAM["width"])]
 
     def select(self, x: int, y: int) -> None:
         """
-        turn to self.stage[x][y] == 1
+        turn to self.__stage[x][y] == 1
         """
-        self.stage[x][y] = 1
+        self.__stage[x][y] = 1
 
     def draw_circle(self, x: int, y: int, radius: int) -> None:
         """
@@ -50,7 +50,14 @@ class StarStage:
 
     def __str__(self):
         print("cells are indexed by [x][y]")
-        return "\n".join(map(str, self.stage))
+        return "\n".join(map(str, self.__stage))
 
-    def get(self):
-        return self.stage
+    @property
+    def get_stagemap(self):
+        """
+        エージェント・誘因力の存在可能部分のみ1にマスクされた
+        二次元配列を返す
+
+        return: self.__stage (list[int][int])
+        """
+        return self.__stage
