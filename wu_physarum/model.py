@@ -49,8 +49,8 @@ class WuPhysarum(Model):
         )
         self.schedule = RandomActivation(self)
         for x, _row in enumerate(self.stage_region):
-            for y, is_in_stage in enumerate(_row):
-                if is_in_stage and self.random.random() < MODEL_PARAM["density"]:
+            for y, stage_region in enumerate(_row):
+                if stage_region and self.random.random() < MODEL_PARAM["density"]:
                     phy = Physarum(
                         pos=(x, y),
                         model=self,
