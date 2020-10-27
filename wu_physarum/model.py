@@ -79,27 +79,64 @@ class WuPhysarum(Model):
         return tuple(datapoint_region)
 
     def __update_map(self, chenu_map, trail_map):
-        # chenu_map, trail_mapの更新を行う
+        """
+        chenu_map, trail_mapの更新を行う
+        """
 
-        # create filter
+        """
+        Applying average filter
+        """
         cnf_w, cnf_h, dampN = (
             LATTICECELL_PARAM["filterN_width"],
             LATTICECELL_PARAM["filterN_height"],
             LATTICECELL_PARAM["dampN"])
         cnf = np.full((cnf_w, cnf_h), (1 - dampN) / (cnf_w * cnf_h))
-
         trf_w, trf_h, dampT = (
             LATTICECELL_PARAM["filterT_width"],
             LATTICECELL_PARAM["filterT_height"],
             LATTICECELL_PARAM["dampT"])
         trf = np.full((trf_w, trf_h), (1 - dampT) / (trf_w * trf_h))
 
-        # TODO: chenu, trailともにstage_region内のみでフィルターを
-        # かけたい
-        # Applying average filter on trail_map
-        trail_map = signal.convolve2d(trail_map, trf, mode="same")
-        # Applying average filter on whole chenu_map
         chenu_map = signal.convolve2d(chenu_map, cnf, mode="same")
+        trail_map = signal.convolve2d(trail_map, trf, mode="same")
+
+        """
+        Adjust the magnification on trail_map, chenu_map for star_stage
+        (trail/chenu_map) .* (周辺セル数) ./ (周辺ステージセル数) .* (self.stage_region)
+        """
+        adjacent_stage_region_cell_num_on_chenu_map = \
+            signal.convolve2d(
+                self.stage_region, np.ones((cnf_w, cnf_h)), mode="same"
+            )
+        fixed_adjacent_stage_region_cell_num_on_chenu_map = \
+            np.maximum(
+                adjacent_stage_region_cell_num_on_chenu_map,
+                np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+            )
+        adjacent_stage_region_cell_num_on_trail_map = \
+            signal.convolve2d(
+                self.stage_region, np.ones((trf_w, trf_h)), mode="same"
+            )
+        fixed_adjacent_stage_region_cell_num_on_trail_map = \
+            np.maximum(
+                adjacent_stage_region_cell_num_on_trail_map,
+                np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+            )
+
+        chenu_map = chenu_map * (cnf_w * cnf_h)\
+            / fixed_adjacent_stage_region_cell_num_on_chenu_map
+        trail_map = trail_map * (trf_w * trf_h)\
+            / fixed_adjacent_stage_region_cell_num_on_trail_map
+
+        """
+        Exclude overhang trail and chenu
+        """
+        chenu_map *= self.stage_region
+        trail_map *= self.stage_region
+
+        """
+        Add chenu on datapoint
+        """
         # Exclude filter effect in datapoint region
         chenu_map *= 1 - self.datapoint_region
         # Add chenu (timed by steps) on datapoint
