@@ -44,7 +44,7 @@ class WuPhysarum(Model):
             self.star_stage.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
 
         # create stage including Lattice Cells function
-        self.stage_region = coords2ndarray(self.star_stage.stage_region)
+        self.stage_region = np.array(self.star_stage.stage_region)
         self.datapoint_region = coords2ndarray(self._create_datapoint_region(self._datapoint_pos))
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
