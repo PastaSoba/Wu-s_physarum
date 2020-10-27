@@ -36,7 +36,12 @@ class WuPhysarum(Model):
 
         # create masked stage
         self.star_stage = StarStage(MODEL_PARAM["width"], MODEL_PARAM["height"])
-        self.star_stage.draw_circle(10, 10, 10)
+        pivot = (100, 100)
+        radius = 30
+        branch = 12
+        self.star_stage.draw_circle(pivot[0], pivot[1], radius)
+        for b in range(branch):
+            self.star_stage.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
 
         # create stage including Lattice Cells function
         self.stage_region = coords2ndarray(self.star_stage.stage_region)
