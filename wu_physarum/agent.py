@@ -79,7 +79,7 @@ class Physarum(Agent):
             self.pos[0] + OFFSET[self.dir_id]["FORWARD"][0],
             self.pos[1] + OFFSET[self.dir_id]["FORWARD"][1]
         )
-        if self.model.grid.is_cell_empty(forward_pos) and self.model.stage_region[forward_pos]:
+        if not self.model.grid.out_of_bounds(forward_pos) and self.model.grid.is_cell_empty(forward_pos) and self.model.stage_region[forward_pos]:
             # If agent CAN move forward successfully,
             # 1. deposit trail on now position
             self.model.trail_map[self.pos] += PHYSARUM_PARAM["depT"]
