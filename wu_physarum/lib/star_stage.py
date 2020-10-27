@@ -2,15 +2,16 @@ from operator import add
 from math import sin, cos, radians
 
 from .convex import convex_hull_inner
-from .setting import MODEL_PARAM
 
 
 class StarStage:
     """
     スター型のステージを作るための自作ライブラリ
     """
-    def __init__(self) -> None:
-        self.__stage = [[0 for j in range(MODEL_PARAM["height"])] for i in range(MODEL_PARAM["width"])]
+    def __init__(self, width, height) -> None:
+        self.width = width
+        self.height = height
+        self.__stage = [[0 for j in range(self.height)] for i in range(self.width)]
 
     def select(self, x: int, y: int) -> None:
         """
@@ -22,8 +23,8 @@ class StarStage:
         """
         (x, y) を中心とした半径 radius の円の領域内の値を1にセットする
         """
-        for i in range(MODEL_PARAM["width"]):
-            for j in range(MODEL_PARAM["height"]):
+        for i in range(self.width):
+            for j in range(self.height):
                 if (i - x)**2 + (j - y)**2 <= radius**2:
                     self.select(i, j)
 
@@ -53,7 +54,7 @@ class StarStage:
         return "\n".join(map(str, self.__stage))
 
     @property
-    def get_stagemap(self):
+    def stage_region(self):
         """
         エージェント・誘因力の存在可能部分のみ1にマスクされた
         二次元配列を返す
