@@ -66,19 +66,6 @@ class WuPhysarum(Model):
                     self.grid.place_agent(phy, (x, y))
                     self.schedule.add(phy)
 
-        # create filter
-        self.cnf_w, self.cnf_h, self.dampN = (
-            LATTICECELL_PARAM["filterN_width"],
-            LATTICECELL_PARAM["filterN_height"],
-            LATTICECELL_PARAM["dampN"])
-        self.cnf = np.full((self.cnf_w, self.cnf_h), (1 - self.dampN) / (self.cnf_w * self.cnf_h))
-
-        self.trf_w, self.trf_h, self.dampT = (
-            LATTICECELL_PARAM["filterT_width"],
-            LATTICECELL_PARAM["filterT_height"],
-            LATTICECELL_PARAM["dampT"])
-        self.trf = np.full((self.trf_w, self.trf_h), (1 - self.dampT) / (self.trf_w * self.trf_h))
-
         # start simulation
         self.running = True
 
@@ -91,16 +78,38 @@ class WuPhysarum(Model):
                     datapoint_region.append(_p)
         return tuple(datapoint_region)
 
+    def __update_map(self, chenu_map, trail_map):
+        # chenu_map, trail_mapの更新を行う
+
+        # create filter
+        cnf_w, cnf_h, dampN = (
+            LATTICECELL_PARAM["filterN_width"],
+            LATTICECELL_PARAM["filterN_height"],
+            LATTICECELL_PARAM["dampN"])
+        cnf = np.full((cnf_w, cnf_h), (1 - dampN) / (cnf_w * cnf_h))
+
+        trf_w, trf_h, dampT = (
+            LATTICECELL_PARAM["filterT_width"],
+            LATTICECELL_PARAM["filterT_height"],
+            LATTICECELL_PARAM["dampT"])
+        trf = np.full((trf_w, trf_h), (1 - dampT) / (trf_w * trf_h))
+
+        # TODO: chenu, trailともにstage_region内のみでフィルターを
+        # かけたい
+        # Applying average filter on trail_map
+        trail_map = signal.convolve2d(trail_map, trf, mode="same")
+        # Applying average filter on whole chenu_map
+        chenu_map = signal.convolve2d(chenu_map, cnf, mode="same")
+        # Exclude filter effect in datapoint region
+        chenu_map *= 1 - self.datapoint_region
+        # Add chenu (timed by steps) on datapoint
+        chenu_map += LATTICECELL_PARAM["CN"] * self.datapoint_region * self.schedule.steps
+
+        return [chenu_map, trail_map]
+
     def step(self):
         # モジホコリエージェントのステップ処理
         self.schedule.step()
 
         # 格子セルのステップ処理
-        # Applying average filter on trail_map
-        self.trail_map = signal.convolve2d(self.trail_map, self.trf, mode="same")
-        # Applying average filter on whole chenu_map
-        self.chenu_map = signal.convolve2d(self.chenu_map, self.cnf, mode="same")
-        # Exclude filter effect in datapoint region
-        self.chenu_map *= 1 - self.datapoint_region
-        # Add chenu (timed by steps) on datapoint
-        self.chenu_map += LATTICECELL_PARAM["CN"] * self.datapoint_region * self.schedule.steps
+        self.chenu_map, self.trail_map = self.__update_map(self.chenu_map, self.trail_map)
