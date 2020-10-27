@@ -1,5 +1,4 @@
 from collections import defaultdict
-from os import name
 
 from mesa.visualization.modules import CanvasGrid
 from mesa.visualization.ModularVisualization import ModularServer
@@ -14,7 +13,7 @@ def agent_portrayal(agent):
         "Color": "red",
         "Filled": "true",
         "Layer": 0,
-        "r": 0.5
+        "r": 1
     }
     return portrayal
 
@@ -36,8 +35,8 @@ grid = CustomCanvasGrid(
     portrayal_method=agent_portrayal,
     grid_width=MODEL_PARAM["width"],
     grid_height=MODEL_PARAM["height"],
-    canvas_width=500,
-    canvas_height=500
+    canvas_width=600,
+    canvas_height=600
 )
 
 server = ModularServer(
