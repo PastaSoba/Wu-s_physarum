@@ -7,7 +7,7 @@ def jsonreader(datapoint_filename):
     """
     jsonファイルから座標の組を読み込む
     usuage:
-        jsonreader("test.json")
+        jsonreader("demo.json")
         -> ((100, 100), (200, 200), (300, 300))
     """
     path = Path(__file__).parent.parent

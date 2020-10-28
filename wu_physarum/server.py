@@ -28,5 +28,5 @@ server = ModularServer(
     model_cls=WuPhysarum,
     visualization_elements=[grid],
     name="Wu's Physarum Model",
-    model_params={"datapoint_filename": "test.json", "seed": MODEL_PARAM["seed"]},
+    model_params={"datapoint_filename": "demo.json", "seed": MODEL_PARAM["seed"]},
 )
