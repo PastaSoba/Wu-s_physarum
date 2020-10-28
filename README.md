@@ -1,3 +1,9 @@
+# 本プログラムについて
+このプログラムは以下の論文で紹介されたマルチエージェントシステムを python製ライブラリ mesa を用いて構築したものです。
+
+論文の内容を精査して構築していますが、論文の意に沿っていない動作をする可能性があります。
+> Wu Y., Zhang Z., Deng Y., Zhou H., Qian T. (2012) An Enhanced Multi-Agent System with Evolution Mechanism to Approximate Physarum Transport Networks. In: Thielscher M., Zhang D. (eds) AI 2012: Advances in Artificial Intelligence. AI 2012. Lecture Notes in Computer Science, vol 7691. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-35101-3_3
+
 ## 動作方法
 1.  python仮想環境の作成とライブラリのインストール
 
