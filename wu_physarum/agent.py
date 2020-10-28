@@ -8,39 +8,40 @@ NINF = -1000000000
 __SENSOR_OFFSET = PHYSARUM_PARAM["sensor_arm_length"] // 2
 OFFSET = {
     # [offset of x, offset of y]
+    # under-left is [0, 0]
 
     # NORTH
-    0: {"LSENSOR": [-__SENSOR_OFFSET, -__SENSOR_OFFSET],
-        "RSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
-        "FORWARD": [0, -1]},
-    # NORTH_EAST
-    1: {"LSENSOR": [0, -__SENSOR_OFFSET],
-        "RSENSOR": [__SENSOR_OFFSET, 0],
-        "FORWARD": [1, -1]},
-    # EAST
-    2: {"LSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
+    0: {"LSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
         "RSENSOR": [__SENSOR_OFFSET, __SENSOR_OFFSET],
+        "FORWARD": [0, 1]},
+    # NORTH_EAST
+    1: {"LSENSOR": [0, __SENSOR_OFFSET],
+        "RSENSOR": [__SENSOR_OFFSET, 0],
+        "FORWARD": [1, 1]},
+    # EAST
+    2: {"LSENSOR": [__SENSOR_OFFSET, __SENSOR_OFFSET],
+        "RSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
         "FORWARD": [1, 0]},
     # SOUTH_EAST
     3: {"LSENSOR": [__SENSOR_OFFSET, 0],
-        "RSENSOR": [0, __SENSOR_OFFSET],
-        "FORWARD": [1, 1]},
+        "RSENSOR": [0, -__SENSOR_OFFSET],
+        "FORWARD": [1, -1]},
     # SOUTH
-    4: {"LSENSOR": [__SENSOR_OFFSET, __SENSOR_OFFSET],
-        "RSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
-        "FORWARD": [0, 1]},
-    # SOUTH_WEST
-    5: {"LSENSOR": [0, __SENSOR_OFFSET],
-        "RSENSOR": [-__SENSOR_OFFSET, 0],
-        "FORWARD": [-1, 1]},
-    # WEST
-    6: {"LSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
+    4: {"LSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
         "RSENSOR": [-__SENSOR_OFFSET, -__SENSOR_OFFSET],
+        "FORWARD": [0, -1]},
+    # SOUTH_WEST
+    5: {"LSENSOR": [0, -__SENSOR_OFFSET],
+        "RSENSOR": [-__SENSOR_OFFSET, 0],
+        "FORWARD": [-1, -1]},
+    # WEST
+    6: {"LSENSOR": [-__SENSOR_OFFSET, -__SENSOR_OFFSET],
+        "RSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
         "FORWARD": [-1, 0]},
     # NORTH_WEST
     7: {"LSENSOR": [-__SENSOR_OFFSET, 0],
-        "RSENSOR": [0, -__SENSOR_OFFSET],
-        "FORWARD": [-1, -1]},
+        "RSENSOR": [0, __SENSOR_OFFSET],
+        "FORWARD": [-1, 1]},
 }
 
 
