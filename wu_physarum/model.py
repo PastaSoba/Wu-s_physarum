@@ -66,6 +66,7 @@ class WuPhysarum(Model):
                     self.grid.place_agent(phy, (x, y))
                     self.schedule.add(phy)
 
+        print("初期配置エージェント数: {}".format(len(self.schedule.agents)))
         # start simulation
         self.running = True
 

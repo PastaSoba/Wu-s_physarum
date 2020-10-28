@@ -8,39 +8,40 @@ NINF = -1000000000
 __SENSOR_OFFSET = PHYSARUM_PARAM["sensor_arm_length"] // 2
 OFFSET = {
     # [offset of x, offset of y]
+    # under-left is [0, 0]
 
     # NORTH
-    0: {"LSENSOR": [-__SENSOR_OFFSET, -__SENSOR_OFFSET],
-        "RSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
-        "FORWARD": [0, -1]},
-    # NORTH_EAST
-    1: {"LSENSOR": [0, -__SENSOR_OFFSET],
-        "RSENSOR": [__SENSOR_OFFSET, 0],
-        "FORWARD": [1, -1]},
-    # EAST
-    2: {"LSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
+    0: {"LSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
         "RSENSOR": [__SENSOR_OFFSET, __SENSOR_OFFSET],
+        "FORWARD": [0, 1]},
+    # NORTH_EAST
+    1: {"LSENSOR": [0, __SENSOR_OFFSET],
+        "RSENSOR": [__SENSOR_OFFSET, 0],
+        "FORWARD": [1, 1]},
+    # EAST
+    2: {"LSENSOR": [__SENSOR_OFFSET, __SENSOR_OFFSET],
+        "RSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
         "FORWARD": [1, 0]},
     # SOUTH_EAST
     3: {"LSENSOR": [__SENSOR_OFFSET, 0],
-        "RSENSOR": [0, __SENSOR_OFFSET],
-        "FORWARD": [1, 1]},
+        "RSENSOR": [0, -__SENSOR_OFFSET],
+        "FORWARD": [1, -1]},
     # SOUTH
-    4: {"LSENSOR": [__SENSOR_OFFSET, __SENSOR_OFFSET],
-        "RSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
-        "FORWARD": [0, 1]},
-    # SOUTH_WEST
-    5: {"LSENSOR": [0, __SENSOR_OFFSET],
-        "RSENSOR": [-__SENSOR_OFFSET, 0],
-        "FORWARD": [-1, 1]},
-    # WEST
-    6: {"LSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
+    4: {"LSENSOR": [__SENSOR_OFFSET, -__SENSOR_OFFSET],
         "RSENSOR": [-__SENSOR_OFFSET, -__SENSOR_OFFSET],
+        "FORWARD": [0, -1]},
+    # SOUTH_WEST
+    5: {"LSENSOR": [0, -__SENSOR_OFFSET],
+        "RSENSOR": [-__SENSOR_OFFSET, 0],
+        "FORWARD": [-1, -1]},
+    # WEST
+    6: {"LSENSOR": [-__SENSOR_OFFSET, -__SENSOR_OFFSET],
+        "RSENSOR": [-__SENSOR_OFFSET, __SENSOR_OFFSET],
         "FORWARD": [-1, 0]},
     # NORTH_WEST
     7: {"LSENSOR": [-__SENSOR_OFFSET, 0],
-        "RSENSOR": [0, -__SENSOR_OFFSET],
-        "FORWARD": [-1, -1]},
+        "RSENSOR": [0, __SENSOR_OFFSET],
+        "FORWARD": [-1, 1]},
 }
 
 
@@ -79,7 +80,7 @@ class Physarum(Agent):
             self.pos[0] + OFFSET[self.dir_id]["FORWARD"][0],
             self.pos[1] + OFFSET[self.dir_id]["FORWARD"][1]
         )
-        if self.model.grid.is_cell_empty(forward_pos) and self.model.stage_region[forward_pos]:
+        if not self.model.grid.out_of_bounds(forward_pos) and self.model.grid.is_cell_empty(forward_pos) and self.model.stage_region[forward_pos]:
             # If agent CAN move forward successfully,
             # 1. deposit trail on now position
             self.model.trail_map[self.pos] += PHYSARUM_PARAM["depT"]
@@ -91,17 +92,17 @@ class Physarum(Agent):
         else:
             # If agent CANNOT move forward successfully,
             # subtract 1 from self motion counter.
+            # heading randomly choiced direction
             self.motion_counter -= 1
             self.__is_successfully_moved = False
+            self.dir_id = self.random.randint(0, 7)
 
     @property
     def is_successfully_moved(self):
         return self.__is_successfully_moved
 
-    def __get_new_dir_id(self, Lweighted_value, Rweighted_value, is_successfully_moved):
-        if is_successfully_moved is False:
-            return self.random.randint(0, 7)        # ランダムな方向を向く
-        elif Lweighted_value is NINF and Rweighted_value is NINF:
+    def __get_new_dir_id(self, Lweighted_value, Rweighted_value):
+        if Lweighted_value is NINF and Rweighted_value is NINF:
             return (self.dir_id + 4) % 8            # 真後ろを向く
         elif Lweighted_value < Rweighted_value:
             return (self.dir_id + 1) % 8            # 右に曲がる
@@ -119,17 +120,16 @@ class Physarum(Agent):
         Lweighted_value = self.__get_weighted_value("LSENSOR")
         Rweighted_value = self.__get_weighted_value("RSENSOR")
 
+        """ Turning Step """
+        new_dir_id = self.__get_new_dir_id(Lweighted_value, Rweighted_value)
+        self.dir_id = new_dir_id
+
         """ Moving Step """
         self.__move_forward()
-        is_successfully_moved = self.is_successfully_moved
-
-        """ Turning Step """
-        new_dir_id = self.__get_new_dir_id(Lweighted_value, Rweighted_value, is_successfully_moved)
-        self.dir_id = new_dir_id
 
         """ Reproduct/Elimination Step"""
         # Reproduct
-        if self.motion_counter > PHYSARUM_PARAM["RT"] and is_successfully_moved:
+        if self.motion_counter > PHYSARUM_PARAM["RT"] and self.is_successfully_moved:
             chrone = Physarum(pos=__reproduction_pos, model=self.model)
             self.model.grid.place_agent(chrone, __reproduction_pos)
             self.model.schedule.add(chrone)
