@@ -52,10 +52,11 @@ class WuPhysarum(Model):
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
         # create physarum agents
+        self.torus = True
         self.grid = SingleGrid(
             width=MODEL_PARAM["width"],
             height=MODEL_PARAM["height"],
-            torus=False,
+            torus=self.torus,
         )
         self.schedule = RandomActivation(self)
         for x, _row in enumerate(self.stage_region):
@@ -85,6 +86,7 @@ class WuPhysarum(Model):
         """
         chenu_map, trail_mapの更新を行う
         """
+        boundary = "wrap" if self.torus else "fill"
 
         """
         Applying average filter
@@ -100,8 +102,8 @@ class WuPhysarum(Model):
             LATTICECELL_PARAM["dampT"])
         trf = np.full((trf_w, trf_h), (1 - dampT) / (trf_w * trf_h))
 
-        chenu_map = signal.convolve2d(chenu_map, cnf, mode="same")
-        trail_map = signal.convolve2d(trail_map, trf, mode="same")
+        chenu_map = signal.convolve2d(chenu_map, cnf, mode="same", boundary=boundary)
+        trail_map = signal.convolve2d(trail_map, trf, mode="same", boundary=boundary)
 
         """
         Adjust the magnification on trail_map, chenu_map for star_stage
@@ -109,7 +111,7 @@ class WuPhysarum(Model):
         """
         adjacent_stage_region_cell_num_on_chenu_map = \
             signal.convolve2d(
-                self.stage_region, np.ones((cnf_w, cnf_h)), mode="same"
+                self.stage_region, np.ones((cnf_w, cnf_h)), mode="same", boundary=boundary
             )
         fixed_adjacent_stage_region_cell_num_on_chenu_map = \
             np.maximum(
@@ -118,7 +120,7 @@ class WuPhysarum(Model):
             )
         adjacent_stage_region_cell_num_on_trail_map = \
             signal.convolve2d(
-                self.stage_region, np.ones((trf_w, trf_h)), mode="same"
+                self.stage_region, np.ones((trf_w, trf_h)), mode="same", boundary=boundary
             )
         fixed_adjacent_stage_region_cell_num_on_trail_map = \
             np.maximum(
