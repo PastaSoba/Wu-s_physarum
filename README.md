@@ -10,7 +10,14 @@
 run.pyが存在するディレクトリで以下のコマンドを入力し、python仮想環境とライブラリをインストールしてください。
 なお、python3.7以降を利用してください。
 ```
+// python仮想環境の作成
 python3 -m venv venv
+
+// python仮想環境の有効化
+venv/Scripts/activate (windows)
+source venv/bin/activate (mac/linux)
+
+// 必要なライブラリのインストール
 pip install -r requirements.txt
 ```
 2. 動作
