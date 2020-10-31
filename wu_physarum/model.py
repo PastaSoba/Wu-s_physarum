@@ -47,7 +47,7 @@ class WuPhysarum(Model):
         # self.stage_region = np.array(self.star_stage.stage_region)
         self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         # self.datapoint_region = coords2ndarray(self._create_datapoint_region(self._datapoint_pos))
-        self.datapoit_region = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+        self.datapoint_region = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
