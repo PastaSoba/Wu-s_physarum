@@ -48,7 +48,7 @@ if __name__ == "__main__":
     from wu_physarum.lib.star_stage import StarStage
 
     """ model.pyのstage_region, datapoint_regionの確認 """
-    jsonfile = "test.json"
+    jsonfile = "demo.json"
     wu_physarum = WuPhysarum(datapoint_filename=jsonfile, seed=0)
     visualize(wu_physarum.stage_region, is_plotted_only_True_points=False)
     visualize(wu_physarum.datapoint_region, is_plotted_only_True_points=False)
