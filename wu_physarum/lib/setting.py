@@ -2,7 +2,7 @@ MODEL_PARAM = {
     "width": 200,
     "height": 200,
     "density": 0.5,
-    "seed": None,
+    "seed": 13573,
 }
 
 PHYSARUM_PARAM = {
