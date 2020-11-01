@@ -1,6 +1,6 @@
 from mesa import Agent
 
-from .lib.setting import PHYSARUM_PARAM
+from .lib.setting import MODEL_PARAM, PHYSARUM_PARAM
 
 
 NINF = -1000000000
@@ -65,6 +65,12 @@ class Physarum(Agent):
             self.pos[0] + OFFSET[self.dir_id][sensor][0],
             self.pos[1] + OFFSET[self.dir_id][sensor][1]
         )
+        if self.model.torus is True:
+            sensing_pos = (
+                sensing_pos[0] % MODEL_PARAM["width"],
+                sensing_pos[1] % MODEL_PARAM["height"]
+            )
+
         if self.model.grid.out_of_bounds(sensing_pos) or self.model.stage_region[sensing_pos] is False:
             return NINF
         else:
@@ -80,6 +86,12 @@ class Physarum(Agent):
             self.pos[0] + OFFSET[self.dir_id]["FORWARD"][0],
             self.pos[1] + OFFSET[self.dir_id]["FORWARD"][1]
         )
+        if self.model.torus is True:
+            forward_pos = (
+                forward_pos[0] % MODEL_PARAM["width"],
+                forward_pos[1] % MODEL_PARAM["height"]
+            )
+
         if not self.model.grid.out_of_bounds(forward_pos) and self.model.grid.is_cell_empty(forward_pos) and self.model.stage_region[forward_pos]:
             # If agent CAN move forward successfully,
             # 1. deposit trail on now position
