@@ -18,8 +18,7 @@ interval = 100    # 画像を保存する間隔（ステップ）
 folder_name = "output_fig/seed_13647"
 
 
-# 新規にフォルダを作成したいときは、以下のコメントを外す
-# os.makedirs(folder_name)
+os.makedirs(folder_name, exist_ok=True)
 start = time.time()
 for i in range(max_iter + 1):
     if i % interval == 0:
