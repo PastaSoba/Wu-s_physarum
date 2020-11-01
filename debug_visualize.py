@@ -38,8 +38,10 @@ def visualize(coords, is_plotted_only_True_points):
     """
     arr = _coords2ndarray(coords) if is_plotted_only_True_points else np.array(coords)
     plt.figure()
-    ax = sns.heatmap(arr, linewidths=1)
+    ax = sns.heatmap(arr.T, cmap='gnuplot')
     ax.invert_yaxis()
+    plt.xlabel("x")
+    plt.ylabel("y")
     plt.show()
 
 

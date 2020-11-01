@@ -22,11 +22,12 @@ os.makedirs(folder_name, exist_ok=True)
 start = time.time()
 for i in range(max_iter + 1):
     if i % interval == 0:
+        # エージェントのある場所を1とした行列を作成
         arr = np.array([[m.grid.grid[i][j] is None for j in range(MODEL_PARAM["height"])] for i in range(MODEL_PARAM["width"])])
 
         plt.clf()
         sns.heatmap(
-            arr,
+            arr.T,
             cbar=False,
             square=True,
         ).invert_yaxis()
