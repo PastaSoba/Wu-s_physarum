@@ -9,29 +9,36 @@ from wu_physarum.model import WuPhysarum
 from wu_physarum.lib.setting import MODEL_PARAM
 
 
+MAX_ITER = 20000  # 最大試行回数
+INTERVAL = 200    # 画像を保存する間隔（ステップ）
+FOLDER_NAME = "output_fig/twelve_ring/seed_13647"  # 画像を保存するディレクトリ名
+
 m = WuPhysarum(
-    datapoint_filename="demo.json",
+    datapoint_filename="twelve_ring.json",
     seed=13647
 )
-max_iter = 10000  # 最大試行回数
-interval = 100    # 画像を保存する間隔（ステップ）
-folder_name = "output_fig/seed_13647"
 
+# 画像保存用のディレクトリを作成
+os.makedirs(FOLDER_NAME, exist_ok=True)
 
-os.makedirs(folder_name, exist_ok=True)
+# 処理時間計測用に、プログラム開始時刻を記録する
 start = time.time()
-for i in range(max_iter + 1):
-    if i % interval == 0:
-        # エージェントのある場所を1とした行列を作成
+for step in range(MAX_ITER + 1):
+    # エージェントの配置を画像として保存する
+    if step % INTERVAL == 0:
         arr = np.array([[m.grid.grid[i][j] is None for j in range(MODEL_PARAM["height"])] for i in range(MODEL_PARAM["width"])])
-
+        arr = np.maximum(arr, m.datapoint_region * 2)
         plt.clf()
         sns.heatmap(
             arr.T,
             cbar=False,
             square=True,
         ).invert_yaxis()
-        plt.savefig("{}/step_{}.png".format(folder_name, i))
+        plt.savefig("{}/step_{}.png".format(FOLDER_NAME, step))
+
+    # i Step までに要した処理時間を表示する
     t = time.time() - start
-    print("\r{}/{} step ({:.2f} sec)".format(i, max_iter, t), end="")
+    print("\r{}/{} step ({:.2f} sec)".format(step, MAX_ITER, t), end="")
+
+    # シミュレーションのステップを進める
     m.step()
