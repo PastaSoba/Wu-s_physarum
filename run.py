@@ -33,6 +33,7 @@ for step in range(MAX_ITER + 1):
             arr.T,
             cbar=False,
             square=True,
+            cmap="viridis",
         ).invert_yaxis()
         plt.savefig("{}/step_{}.png".format(FOLDER_NAME, step))
 
