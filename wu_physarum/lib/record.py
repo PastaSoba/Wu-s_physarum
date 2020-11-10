@@ -51,14 +51,35 @@ class ModelRecorder:
                      range(MODEL_PARAM["width"])]
                 )
                 arr = np.maximum(arr, self.model.datapoint_region * 2)
-                plt.clf()
+
+                fig, ((phys, _), (chenu, trail)) = plt.subplots(2, 2, sharex=True, sharey=True)
                 sns.heatmap(
                     arr.T,
+                    square=True,
+                    cmap="viridis",
+                    ax=phys
+                ).invert_yaxis()
+                sns.heatmap(
+                    self.model.chenu_map.T,
                     cbar=True,
                     square=True,
                     cmap="viridis",
+                    ax=chenu
                 ).invert_yaxis()
-                plt.savefig("{}/step_{}.png".format(self.dir_name, self.model.schedule.steps))
+                sns.heatmap(
+                    self.model.trail_map.T,
+                    cbar=True,
+                    square=True,
+                    cmap="viridis",
+                    ax=trail
+                ).invert_yaxis()
+                phys.set_title("physarum & datapoint map")
+                chenu.set_title("chemo nutrient map")
+                trail.set_title("trail map")
+
+                fig.savefig("{}/step_{}.png".format(self.dir_name, self.model.schedule.steps))
+                plt.clf()
+                plt.close()
 
             t = time.time() - self.start_time
             print("\r{}/{} step ({:.2f} sec)".format(step, self.max_iter, t), end="")
