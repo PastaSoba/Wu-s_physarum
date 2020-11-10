@@ -37,7 +37,7 @@ class ModelRecorder:
         self.__makeFigDir()
         self.__startTimer()
 
-        for step in range(self.max_iter+1):
+        for step in range(self.max_iter + 1):
             if step % self.interval == 0:
                 """
                 arr配列の各値の割り当て
@@ -71,6 +71,8 @@ class ModelRecorder:
                     cbar=True,
                     square=True,
                     cmap="viridis",
+                    vmin=0,
+                    vmax=12,
                     ax=trail
                 ).invert_yaxis()
                 phys.set_title("physarum & datapoint map")
