@@ -68,8 +68,36 @@ class WuPhysarum(Model):
                     self.grid.place_agent(phy, (x, y))
                     self.schedule.add(phy)
 
-        print("初期配置エージェント数: {}".format(len(self.schedule.agents)))
+        # create adjacent cell map for adjusting the magnification
+        boundary = "wrap" if self.torus else "fill"
+        cnf_w, cnf_h, trf_w, trf_h = (
+            LATTICECELL_PARAM["filterN_width"],
+            LATTICECELL_PARAM["filterN_height"],
+            LATTICECELL_PARAM["filterT_width"],
+            LATTICECELL_PARAM["filterT_height"],
+        )
+
+        adjacent_stage_region_cell_num_on_chenu_map = \
+            signal.convolve2d(
+                self.stage_region, np.ones((cnf_w, cnf_h)), mode="same", boundary=boundary
+            )
+        self.fixed_adjacent_stage_region_cell_num_on_chenu_map = \
+            np.maximum(
+                adjacent_stage_region_cell_num_on_chenu_map,
+                np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+            )
+        adjacent_stage_region_cell_num_on_trail_map = \
+            signal.convolve2d(
+                self.stage_region, np.ones((trf_w, trf_h)), mode="same", boundary=boundary
+            )
+        self.fixed_adjacent_stage_region_cell_num_on_trail_map = \
+            np.maximum(
+                adjacent_stage_region_cell_num_on_trail_map,
+                np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+            )
+
         # start simulation
+        print("初期配置エージェント数: {}".format(len(self.schedule.agents)))
         self.running = True
 
     def _create_datapoint_region(self, pos):
@@ -108,29 +136,10 @@ class WuPhysarum(Model):
         Adjust the magnification on trail_map, chenu_map for star_stage
         (trail/chenu_map) .* (周辺セル数) ./ (周辺ステージセル数) .* (self.stage_region)
         """
-        adjacent_stage_region_cell_num_on_chenu_map = \
-            signal.convolve2d(
-                self.stage_region, np.ones((cnf_w, cnf_h)), mode="same", boundary=boundary
-            )
-        fixed_adjacent_stage_region_cell_num_on_chenu_map = \
-            np.maximum(
-                adjacent_stage_region_cell_num_on_chenu_map,
-                np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-            )
-        adjacent_stage_region_cell_num_on_trail_map = \
-            signal.convolve2d(
-                self.stage_region, np.ones((trf_w, trf_h)), mode="same", boundary=boundary
-            )
-        fixed_adjacent_stage_region_cell_num_on_trail_map = \
-            np.maximum(
-                adjacent_stage_region_cell_num_on_trail_map,
-                np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-            )
-
         chenu_map = chenu_map * (cnf_w * cnf_h)\
-            / fixed_adjacent_stage_region_cell_num_on_chenu_map
+            / self.fixed_adjacent_stage_region_cell_num_on_chenu_map
         trail_map = trail_map * (trf_w * trf_h)\
-            / fixed_adjacent_stage_region_cell_num_on_trail_map
+            / self.fixed_adjacent_stage_region_cell_num_on_trail_map
 
         """
         Exclude overhang trail and chenu

@@ -77,8 +77,8 @@ class Physarum(Agent):
             sensing_cell_trail = self.model.trail_map[sensing_pos]
             sensing_cell_chenu = self.model.chenu_map[sensing_pos]
 
-            weighted_value = sensing_cell_trail * PHYSARUM_PARAM["WT"]
-            + sensing_cell_chenu * PHYSARUM_PARAM["WN"]
+            weighted_value = sensing_cell_trail * PHYSARUM_PARAM["WT"] \
+                + sensing_cell_chenu * PHYSARUM_PARAM["WN"]
             return weighted_value
 
     def __move_forward(self):
