@@ -87,3 +87,4 @@ class ModelRecorder:
             print("\r{}/{} step ({:.2f} sec)".format(step, self.max_iter, t), end="")
 
             self.model.step()
+        print("")
