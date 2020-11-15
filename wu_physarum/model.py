@@ -20,7 +20,7 @@ class WuPhysarum(Model):
     def __init__(
         self,
         datapoint_filename,
-        seed=MODEL_PARAM["seed"],
+        seed,
     ):
         """
         新しいTSPソルバを作る
