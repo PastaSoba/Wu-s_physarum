@@ -152,7 +152,7 @@ class WuPhysarum(Model):
         """
         # Exclude filter effect in datapoint region
         chenu_map *= 1 - self.datapoint_region
-        # Add chenu (timed by steps) on datapoint
+        # Add chenu on datapoint
         chenu_map += LATTICECELL_PARAM["CN"] * self.datapoint_region
 
         return [chenu_map, trail_map]
