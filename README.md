@@ -35,7 +35,12 @@ python run.py
 2. wu_physarum/server.py の datapoint_filename を変更する
 
 ### ステージ作成条件の変更
-wu_physarum/model.py のコンストラクタの self.stage_region, self.datapoint_region を変更することで、餌のないステージや星形のステージ等のステージ作成条件の変更が可能です。
+wu_physarum/model.py のコンストラクタを変更することで、餌のないステージや星形のステージ等のステージ作成条件の変更が可能です。
+
+- self.create_physarum_region # モデル起動時にモジホコリエージェントを作成する領域
+- self.stage_region # エージェントの移動、誘因力の伝搬が有効な領域
+- self.chenu_map # 初期誘因力（chemo nutrient）の配列
+- self.trail_map # 初期誘因力（trail）の配列
 
 ただし、いずれの変数も (MODEL_PARAM["width"], MODEL_PARAM["height"]) のサイズかつ、有効範囲を1, 無効範囲を0で表現した numpy.ndarray を使ってください。
 
