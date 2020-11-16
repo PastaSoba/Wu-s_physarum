@@ -45,8 +45,9 @@ class WuPhysarum(Model):
         # self.stage_region = np.array(self.star_stage.stage_region)
 
         # create stage including Lattice Cells function
+        self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.datapoint_region = coords2ndarray(self._create_datapoint_region(self._datapoint_pos))
+        self.__datapoint_region = coords2ndarray(self.__create_datapoint_region(self._datapoint_pos))
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
@@ -58,9 +59,9 @@ class WuPhysarum(Model):
             torus=self.torus,
         )
         self.schedule = RandomActivation(self)
-        for x, _row in enumerate(self.stage_region):
-            for y, stage_region in enumerate(_row):
-                if stage_region and self.random.random() < MODEL_PARAM["density"]:
+        for x, _row in enumerate(self.create_physarum_region):
+            for y, create_region in enumerate(_row):
+                if create_region and self.random.random() < MODEL_PARAM["density"]:
                     phy = Physarum(
                         pos=(x, y),
                         model=self,
@@ -100,7 +101,7 @@ class WuPhysarum(Model):
         print("初期配置エージェント数: {}".format(len(self.schedule.agents)))
         self.running = True
 
-    def _create_datapoint_region(self, pos):
+    def __create_datapoint_region(self, pos):
         datapoint_region = []
         for p in pos:
             for i, j in product(range(-1, 2), range(-1, 2)):
@@ -151,11 +152,15 @@ class WuPhysarum(Model):
         Add chenu on datapoint
         """
         # Exclude filter effect in datapoint region
-        chenu_map *= 1 - self.datapoint_region
+        chenu_map *= 1 - self.__datapoint_region
         # Add chenu on datapoint
-        chenu_map += LATTICECELL_PARAM["CN"] * self.datapoint_region
+        chenu_map += LATTICECELL_PARAM["CN"] * self.__datapoint_region
 
         return [chenu_map, trail_map]
+
+    @property
+    def datapoint_region(self):
+        return self.__datapoint_region
 
     def step(self):
         # モジホコリエージェントのステップ処理
