@@ -35,18 +35,17 @@ class WuPhysarum(Model):
         self._datapoint_pos = jsonreader(datapoint_filename)
 
         # create masked stage
-        # self.star_stage = StarStage(MODEL_PARAM["width"], MODEL_PARAM["height"])
-        # pivot = (100, 100)
-        # radius = 30
-        # branch = 12
-        # self.star_stage.draw_circle(pivot[0], pivot[1], radius)
-        # for b in range(branch):
-        #     self.star_stage.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
-        # self.stage_region = np.array(self.star_stage.stage_region)
+        self.star_stage = StarStage(MODEL_PARAM["width"], MODEL_PARAM["height"])
+        pivot = (100, 100)
+        radius = 30
+        branch = 6
+        self.star_stage.draw_circle(pivot[0], pivot[1], radius)
+        for b in range(branch):
+            self.star_stage.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
 
         # create stage including Lattice Cells function
-        self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+        self.create_physarum_region = np.array(self.star_stage.stage_region)
+        self.stage_region = np.array(self.star_stage.stage_region)
         self.__datapoint_region = coords2ndarray(self.__create_datapoint_region(self._datapoint_pos))
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
