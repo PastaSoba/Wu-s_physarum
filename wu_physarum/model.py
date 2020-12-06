@@ -45,11 +45,11 @@ class WuPhysarum(Model):
         # self.stage_region = np.array(self.star_stage.stage_region)
 
         # create stage including Lattice Cells function
-        self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.__chenu_adding_region = self.__create_chenu_adding_region(self.__datapoint_pos)
-        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+        self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))   # モジホコリが生成されうる区域
+        self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))             # ステージの区域
+        self.__chenu_adding_region = self.__create_chenu_adding_region(self.__datapoint_pos)   # chenuが追加される区域（データポイント周辺）
+        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))               # chenuの強度マップ
+        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))               # trailの強度マップ
 
         # create physarum agents
         self.torus = False
