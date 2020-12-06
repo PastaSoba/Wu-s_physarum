@@ -1,7 +1,7 @@
 from operator import add
 from math import sin, cos, radians
 
-from .convex import convex_hull_inner
+from .convex_stage import convex_hull_inner
 
 
 class StarStage:

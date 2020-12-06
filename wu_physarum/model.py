@@ -8,7 +8,7 @@ from scipy import signal
 
 from .agent import Physarum
 from .lib.jsondeal import jsonreader
-from .lib.convex import coords2ndarray
+from .lib.convex_stage import coords2ndarray
 from .lib.setting import MODEL_PARAM, LATTICECELL_PARAM
 from .lib.star_stage import StarStage
 
