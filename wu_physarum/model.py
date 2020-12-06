@@ -32,7 +32,7 @@ class WuPhysarum(Model):
             seed: 乱数のシード値
         """
         # read datapoint position
-        self._datapoint_pos = jsonreader(datapoint_filename)
+        self.__datapoint_pos = jsonreader(datapoint_filename)
 
         # create masked stage
         # self.star_stage = StarStage(MODEL_PARAM["width"], MODEL_PARAM["height"])
@@ -47,7 +47,7 @@ class WuPhysarum(Model):
         # create stage including Lattice Cells function
         self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.__datapoint_region = coords2ndarray(self.__create_datapoint_region(self._datapoint_pos))
+        self.__chenu_adding_region = coords2ndarray(self.__create_chenu_adding_region(self.__datapoint_pos))
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
@@ -101,7 +101,7 @@ class WuPhysarum(Model):
         print("初期配置エージェント数: {}".format(len(self.schedule.agents)))
         self.running = True
 
-    def __create_datapoint_region(self, pos):
+    def __create_chenu_adding_region(self, pos):
         datapoint_region = []
         for p in pos:
             for i, j in product(range(-1, 2), range(-1, 2)):
@@ -152,15 +152,15 @@ class WuPhysarum(Model):
         Add chenu on datapoint
         """
         # Exclude filter effect in datapoint region
-        chenu_map *= 1 - self.__datapoint_region
+        chenu_map *= 1 - self.__chenu_adding_region
         # Add chenu on datapoint
-        chenu_map += LATTICECELL_PARAM["CN"] * self.__datapoint_region
+        chenu_map += LATTICECELL_PARAM["CN"] * self.__chenu_adding_region
 
         return [chenu_map, trail_map]
 
     @property
     def datapoint_region(self):
-        return self.__datapoint_region
+        return self.__chenu_adding_region
 
     def step(self):
         # モジホコリエージェントのステップ処理
