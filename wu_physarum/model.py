@@ -47,7 +47,7 @@ class WuPhysarum(Model):
         # create stage including Lattice Cells function
         self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.__chenu_adding_region = coords2ndarray(self.__create_chenu_adding_region(self.__datapoint_pos))
+        self.__chenu_adding_region = self.__create_chenu_adding_region(self.__datapoint_pos)
         self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
         self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
 
@@ -102,13 +102,18 @@ class WuPhysarum(Model):
         self.running = True
 
     def __create_chenu_adding_region(self, pos):
-        datapoint_region = []
+        """
+        ステップごとにchenuが追加される区域を作成する。
+        返り値は追加される座標を1、そうでない座標を0とする2次元配列とする。
+        """
+        datapoint_pos = []
         for p in pos:
             for i, j in product(range(-1, 2), range(-1, 2)):
                 _p = (p[0] + i, p[1] + j)
                 if 0 <= _p[0] < MODEL_PARAM["width"] and 0 <= _p[1] < MODEL_PARAM["height"]:
-                    datapoint_region.append(_p)
-        return tuple(datapoint_region)
+                    datapoint_pos.append(_p)
+        datapoint_region = coords2ndarray(tuple(datapoint_pos))
+        return datapoint_region
 
     def __update_map(self, chenu_map, trail_map):
         """
