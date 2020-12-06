@@ -59,8 +59,8 @@ if __name__ == "__main__":
     pivot = (100, 100)
     radius = 30
     branch = 12
-    starstage = StarStage()
+    starstage = StarStage(200, 200)
     starstage.draw_circle(pivot[0], pivot[1], radius)
     for b in range(branch):
         starstage.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
-    visualize(starstage.get(), is_plotted_only_True_points=False)
+    visualize(starstage.stage_region, is_plotted_only_True_points=False)

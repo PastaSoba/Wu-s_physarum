@@ -1,3 +1,4 @@
+import sys
 from itertools import product
 
 from mesa import Model
@@ -8,7 +9,7 @@ from scipy import signal
 
 from .agent import Physarum
 from .lib.jsondeal import jsonreader
-from .lib.convex import coords2ndarray
+from .lib.convex_stage import coords2ndarray
 from .lib.setting import MODEL_PARAM, LATTICECELL_PARAM
 from .lib.star_stage import StarStage
 
@@ -32,7 +33,7 @@ class WuPhysarum(Model):
             seed: 乱数のシード値
         """
         # read datapoint position
-        self._datapoint_pos = jsonreader(datapoint_filename)
+        self.__datapoint_pos = jsonreader(datapoint_filename)
 
         # create masked stage
         # self.star_stage = StarStage(MODEL_PARAM["width"], MODEL_PARAM["height"])
@@ -45,11 +46,12 @@ class WuPhysarum(Model):
         # self.stage_region = np.array(self.star_stage.stage_region)
 
         # create stage including Lattice Cells function
-        self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.__datapoint_region = coords2ndarray(self.__create_datapoint_region(self._datapoint_pos))
-        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
-        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+        self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))        # モジホコリが生成されうる区域
+        self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))                  # ステージの区域
+        self.__chenu_adding_region = self.__create_chenu_adding_region(self.__datapoint_pos)        # chenuが追加される区域（データポイント周辺）
+        self.__chenu_adding_intensity = self.__create_chenu_adding_intensity(self.__datapoint_pos)  # 追加されるchenuの強度マップ
+        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))                    # chenuの強度マップ
+        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))                    # trailの強度マップ
 
         # create physarum agents
         self.torus = False
@@ -101,14 +103,37 @@ class WuPhysarum(Model):
         print("初期配置エージェント数: {}".format(len(self.schedule.agents)))
         self.running = True
 
-    def __create_datapoint_region(self, pos):
-        datapoint_region = []
+    def __create_chenu_adding_region(self, pos):
+        """
+        ステップごとにchenuが追加される区域を作成する。
+        返り値は追加される座標を1、そうでない座標を0とする2次元配列とする。
+        """
+        datapoint_pos = []
         for p in pos:
             for i, j in product(range(-1, 2), range(-1, 2)):
                 _p = (p[0] + i, p[1] + j)
                 if 0 <= _p[0] < MODEL_PARAM["width"] and 0 <= _p[1] < MODEL_PARAM["height"]:
-                    datapoint_region.append(_p)
-        return tuple(datapoint_region)
+                    datapoint_pos.append(_p)
+        datapoint_region = coords2ndarray(tuple(datapoint_pos))
+        return datapoint_region
+
+    def __create_chenu_adding_intensity(self, pos):
+        """
+        ステップごとにどの座標にいくらの強度のchenuが追加されるかのマップを作成する。
+        (__create_chenu_adding_regionとは違い、出力されるマップには0, 1以外の値も含む)
+        """
+        chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+        is_intensity_settled = len(pos[0]) == 3
+
+        for p in pos:
+            if len(p) != 2 + is_intensity_settled:
+                print("エラー：座標によってintensityの設定が異なります")
+                sys.exit()
+            for i, j in product(range(-1, 2), range(-1, 2)):
+                _p = (p[0] + i, p[1] + j)
+                if 0 <= _p[0] < MODEL_PARAM["width"] and 0 <= _p[1] < MODEL_PARAM["height"]:
+                    chenu_map[_p[0]][_p[1]] = p[2] if is_intensity_settled else LATTICECELL_PARAM["CN"]
+        return chenu_map
 
     def __update_map(self, chenu_map, trail_map):
         """
@@ -152,15 +177,15 @@ class WuPhysarum(Model):
         Add chenu on datapoint
         """
         # Exclude filter effect in datapoint region
-        chenu_map *= 1 - self.__datapoint_region
+        chenu_map *= (1 - self.__chenu_adding_region)
         # Add chenu on datapoint
-        chenu_map += LATTICECELL_PARAM["CN"] * self.__datapoint_region
+        chenu_map += self.__chenu_adding_intensity
 
         return [chenu_map, trail_map]
 
     @property
     def datapoint_region(self):
-        return self.__datapoint_region
+        return self.__chenu_adding_region
 
     def step(self):
         # モジホコリエージェントのステップ処理
