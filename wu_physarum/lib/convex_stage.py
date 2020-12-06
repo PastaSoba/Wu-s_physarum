@@ -12,6 +12,10 @@ def __convex_hull_vertex(points):
     # https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/__convex_hull/Monotone_chain#Python
     # より引用
 
+    # intensityが含まれている場合に警告
+    if len(points[0]) > 2:
+        print("警告：座標の次元が3以上存在しています。")
+
     # Sort the points lexicographically (tuples are compared lexicographically).
     # Remove duplicates to detect the case we have just one unique point.
     points = sorted(set(points))

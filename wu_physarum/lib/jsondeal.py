@@ -16,10 +16,15 @@ def jsonreader(datapoint_filename):
     try:
         with open(os.path.join(path, datapoint_filename)) as f:
             datas = json.load(f)
-
             coords = []
-            for data in datas:
-                coords.append((data["x"], data["y"]))
+            if len(datas[1]) == 2:
+                # intensityがセットされていないとき
+                for data in datas:
+                    coords.append((data["x"], data["y"]))
+            elif len(datas[1]) == 3:
+                # intensityがセットされているとき
+                for data in datas:
+                    coords.append((data["x"], data["y"], data["intensity"]))
 
             return tuple(coords)
     except Exception as e:
