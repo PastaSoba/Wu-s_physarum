@@ -14,6 +14,14 @@ from .lib.setting import MODEL_PARAM, LATTICECELL_PARAM
 from .lib.star_stage import StarStage
 
 
+def all_zero_stage():
+    return np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+
+
+def all_one_stage():
+    return np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+
+
 class WuPhysarum(Model):
     """
     モジホコリエージェントによるTSPソルバのモデル
@@ -46,12 +54,12 @@ class WuPhysarum(Model):
         # self.stage_region = np.array(self.star_stage.stage_region)
 
         # create stage including Lattice Cells function
-        self.create_physarum_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))        # モジホコリが生成されうる区域
-        self.stage_region = np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))                  # ステージの区域
-        self.__chenu_adding_region = self.__create_chenu_adding_region(self.__datapoint_pos)        # chenuが追加される区域（データポイント周辺）
+        self.create_physarum_region   = all_one_stage()                                             # モジホコリが生成されうる区域
+        self.stage_region             = all_one_stage()                                             # ステージの区域
+        self.__chenu_adding_region    = self.__create_chenu_adding_region(self.__datapoint_pos)     # chenuが追加される区域（データポイント周辺）
         self.__chenu_adding_intensity = self.__create_chenu_adding_intensity(self.__datapoint_pos)  # 追加されるchenuの強度マップ
-        self.chenu_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))                    # chenuの強度マップ
-        self.trail_map = np.zeros((MODEL_PARAM["width"], MODEL_PARAM["height"]))                    # trailの強度マップ
+        self.chenu_map                = all_zero_stage()                                            # chenuの強度マップ
+        self.trail_map                = all_zero_stage()                                            # trailの強度マップ
 
         # create physarum agents
         self.torus = False
