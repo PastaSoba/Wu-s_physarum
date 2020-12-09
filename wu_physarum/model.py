@@ -69,8 +69,8 @@ class WuPhysarum(Model):
         self.stage_region             = all_one_stage()                                             # ステージの区域
         self.__chenu_adding_region    = self.__create_chenu_adding_region(self.__datapoint_pos)     # chenuが追加される区域（データポイント周辺）
         self.__chenu_adding_intensity = self.__create_chenu_adding_intensity(self.__datapoint_pos)  # 追加されるchenuの強度マップ
-        self.chenu_map                = all_zero_stage()                                            # chenuの強度マップ
-        self.trail_map                = all_zero_stage()                                            # trailの強度マップ
+        self.chenu_map                = all_zero_stage()                                            # chenuの強度マップ（基本的には変更不要）
+        self.trail_map                = all_zero_stage()                                            # trailの強度マップ（基本的には変更不要）
 
         # create physarum agents
         self.torus = False
