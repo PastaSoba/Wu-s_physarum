@@ -9,9 +9,7 @@ from scipy import signal
 
 from .agent import Physarum
 from .lib.jsondeal import jsonreader
-from .lib.convex_stage import coords2ndarray
 from .lib.setting import MODEL_PARAM, LATTICECELL_PARAM
-from .lib.star_stage import StarStage
 
 
 def all_zero_stage():
@@ -20,6 +18,19 @@ def all_zero_stage():
 
 def all_one_stage():
     return np.ones((MODEL_PARAM["width"], MODEL_PARAM["height"]))
+
+
+def coords2ndarray(coords):
+    """
+    プロットされる点の座標のみが入っている二次元配列を、
+    プロットされる点の座標の要素が1となっている二次元配列に変換する
+
+    入力：((0, 0), (1, 1)) ※1に指定されている座標が(0, 0)と(1, 1)だと解釈
+    出力：np.array([[1, 0],
+                    [0, 1]])
+    """
+    array = [[(i, j) in coords for j in range(MODEL_PARAM["height"])] for i in range(MODEL_PARAM["width"])]
+    return np.array(array)
 
 
 class WuPhysarum(Model):
