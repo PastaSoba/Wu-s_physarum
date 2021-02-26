@@ -50,6 +50,7 @@ class Physarum(Agent):
     モジホコリエージェント
     """
     unique_id = 1
+    MAX_NUMBER = 410
 
     def __init__(self, pos, model):
         super().__init__(Physarum.unique_id, model)

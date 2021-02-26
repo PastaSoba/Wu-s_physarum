@@ -55,14 +55,17 @@ class WuPhysarum(Model):
         self.__datapoint_pos = jsonreader(datapoint_filename)
 
         # create masked stage
-        # self.star_stage = StarStage(MODEL_PARAM["width"], MODEL_PARAM["height"])
-        # pivot = (100, 100)
-        # radius = 30
-        # branch = 12
-        # self.star_stage.draw_circle(pivot[0], pivot[1], radius)
-        # for b in range(branch):
-        #     self.star_stage.draw_rect(pivot[0], pivot[1], radius, 10, 60, 360 / branch * b)
-        # self.stage_region = np.array(self.star_stage.stage_region)
+        from .lib.star_stage import StarStage
+        self.star_stage = StarStage(MODEL_PARAM["width"], MODEL_PARAM["height"])
+        pivot = (100, 120)
+        R = 5
+        W = 5
+        self.star_stage.draw_rect(pivot[0], pivot[1], 0, W, 10 * R, 0)      # 品物a
+        self.star_stage.draw_rect(pivot[0], pivot[1], 0, W, 12 * R, 60)     # 品物b
+        self.star_stage.draw_rect(pivot[0], pivot[1], 0, W,  7 * R, 120)    # 品物c
+        self.star_stage.draw_rect(pivot[0], pivot[1], 0, W,  9 * R, 180)    # 品物d
+        self.star_stage.draw_rect(pivot[0], pivot[1], 0, W, 21 * R, 240)    # 品物e
+        self.star_stage.draw_rect(pivot[0], pivot[1], 0, W, 16 * R, 300)    # 品物f
 
         # create stage including Lattice Cells function
         self.create_physarum_region   = all_one_stage()                                             # モジホコリが生成されうる区域
