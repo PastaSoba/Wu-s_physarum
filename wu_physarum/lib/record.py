@@ -11,7 +11,7 @@ recorder = ModelRecorder(
     model=WuPhysarum,
     datapoint_filename="twelve_ring.json",
     seed=13647,                                            # モデルに与えるseed値
-    figure_folername="output_fig/twelve_ring/seed_13647",  # 画像を保存するディレクトリ名
+    figure_foldername="output_fig/twelve_ring/seed_13647",  # 画像を保存するディレクトリ名
     max_iteration=20000,                                   # 最大試行回数
     record_interval=200,                                   # 画像を保存する間隔（ステップ）
 )
@@ -22,12 +22,16 @@ recorder.start()
 
 import os
 import time
+import shutil
+from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 from wu_physarum.lib.setting import MODEL_PARAM
+
+path = Path(__file__).parent.parent
 
 
 class ModelRecorder:
@@ -36,7 +40,8 @@ class ModelRecorder:
             model,
             datapoint_filename,
             seed,
-            figure_folername,
+            figure_foldername,
+            meta_foldername,
             max_iteration,
             record_interval,
     ):
@@ -44,7 +49,9 @@ class ModelRecorder:
             datapoint_filename=datapoint_filename,
             seed=seed,
         )
-        self.dir_name = figure_folername
+        self.datapoint_filename = datapoint_filename
+        self.figdir_name = figure_foldername
+        self.metadir_name = meta_foldername
         self.max_iter = max_iteration
         self.interval = record_interval
         self.start_time = None
@@ -53,10 +60,19 @@ class ModelRecorder:
         self.start_time = time.time()
 
     def __makeFigDir(self):
-        os.makedirs(self.dir_name, exist_ok=True)
+        os.makedirs(self.figdir_name, exist_ok=True)
+
+    def __makeMetaDir(self):
+        os.makedirs(self.metadir_name, exist_ok=True)
+        os.path.join(path, 'resource', self.datapoint_filename)
+        shutil.copy(os.path.join(path, 'resource', self.datapoint_filename), self.metadir_name)  # データポイントファイルの保存
+        shutil.copy(os.path.join(path, 'lib', 'setting.py'), self.metadir_name)
+        shutil.copy(os.path.join(path, 'agent.py'), self.metadir_name)
+        shutil.copy(os.path.join(path, 'model.py'), self.metadir_name)
 
     def start(self):
         self.__makeFigDir()
+        self.__makeMetaDir()
         self.__startTimer()
 
         for step in range(self.max_iter + 1):
@@ -101,7 +117,7 @@ class ModelRecorder:
                 chenu.set_title("chemo nutrient map")
                 trail.set_title("trail map")
 
-                fig.savefig("{}/step_{}.png".format(self.dir_name, self.model.schedule.steps))
+                fig.savefig("{}/step_{}.png".format(self.figdir_name, self.model.schedule.steps))
                 plt.clf()
                 plt.close()
 
